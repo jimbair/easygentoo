@@ -13,6 +13,7 @@
 # issues along the way which I remedy by moving stuff around. This 
 # can probably be done better, but I just fixed stuff as it came up.
 #
+# 1.2 - Migrated into github, corrected an echo syntax
 # 1.1 - Fixed sort -r bug by using ls -c instead
 #     - Added $PATH / $script / $kernelSymlink
 #     - Added -d check for /boot/
@@ -80,7 +81,7 @@ if [ -e $kernelSymlink ]; then
 		fullKernelPath=$(readlink -e $kernelSymlink 2>&1)
 		# Make sure readlink exits cleanly
 		if [ $? -ne 0 ]; then
-			echo "ERROR: Unable to find the full path of our Linux kernel. Exiting." >&2
+			echo 'ERROR: Unable to find the full path of our Linux kernel. Exiting.' >&2
 			exit 1
 		else
 			echo "SUCCESS: Discovered current Linux kernel source: $fullKernelPath"
