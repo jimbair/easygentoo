@@ -13,16 +13,17 @@
 # issues along the way which I remedy by moving stuff around. This 
 # can probably be done better, but I just fixed stuff as it came up.
 #
-# 1.2 - Migrated into github, corrected an echo syntax
-# 1.1 - Fixed sort -r bug by using ls -c instead
-#     - Added $PATH / $script / $kernelSymlink
-#     - Added -d check for /boot/
-#     - Added more sanity checking
-#       Thanks to David Cantrell for the help on 1.1
+# 1.21 - Defined ${boot} properly in the grub config section
+# 1.2  - Migrated into github, corrected an echo syntax
+# 1.1  - Fixed sort -r bug by using ls -c instead
+#      - Added $PATH / $script / $kernelSymlink
+#      - Added -d check for /boot/
+#      - Added more sanity checking
+#        Thanks to David Cantrell for the help on 1.1
 #
-# 1.0 - Developed and deemed working after some testing.
+# 1.0  - Developed and deemed working after some testing.
 #
-# 0.1 - Development
+# 0.1  - Development
 #
 # Copyright (C) 2009  James Bair <james.d.bair@gmail.com>
 #
@@ -307,7 +308,7 @@ cat > $grubConf << EOTOP
 
 default 0
 timeout 3
-splashimage=(hd0,0)$bootgrub/splash.xpm.gz
+splashimage=(hd0,0)${boot}grub/splash.xpm.gz
 EOTOP
 
 # Time to generate our new Kernel config dynamically!
