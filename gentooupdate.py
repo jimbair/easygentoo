@@ -264,14 +264,16 @@ def main():
 			print 'Checking Gentoo for package dependency errors.'
 			os.system("revdep-rebuild")
 
+			# Remove all distfiles
+			print 'Removing distfiles from system.'
+			shutil.rmtree('/usr/portage/distfiles/')
+
 			print 'All distfiles have been deleted. Invoking etc-update to check for configuration updates.'
 			os.system("etc-update")
 
 			print 'All finished! Your Gentoo installation has been successfully updated.'
 			sys.exit(0)
 
-			# Remove all distfiles
-			shutil.rmtree('/usr/portage/distfiles/')
 
 		elif answer == 'no':
 			print 'Portage update has been aborted.'
