@@ -281,8 +281,7 @@ def main():
 		else:
 			print "Input '" + answer + "' not understood. Try again."
 
-# Run the script but halt of ctrl+c is given
-# Doesn't seem to be working =(
+# Run main() if ran directly, but halt if ctrl+c is given
 if __name__ == "__main__":
 	try:
 		main()
