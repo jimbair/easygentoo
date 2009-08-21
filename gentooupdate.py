@@ -111,15 +111,11 @@ def update_script():
 		revLine = revLine.strip()
 		newRev = newRev.strip()
 
-		# Need to make our new revision # a float
-		try:
-			newRev = float(newRev)
-		except:
-			print 'Attempted to set newRev to a float and failed.'
-			print 'Our line is:', lines[revLineNumber]
-
 		# If this is rev, then we're good
 		if revLine == 'rev':
+
+			# Need to make our new revision # a float
+			newRev = float(newRev)
 
 			# Verify our rev is older than the latest one downloaded
 			if rev >= newRev:
