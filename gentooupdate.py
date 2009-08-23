@@ -3,6 +3,7 @@
 # Python script to update Gentoo.
 # NOTE: DO NOT REMOVE THE ABOVE LINE! USED FOR SANITY CHECKING! =)
 #
+# v4.02 - Fixed a bug with dist-file removal
 # v4.01 - Finished and tested as working. Yey for Python!
 # v4.00 - Re-written in Python goodness with much help from David C.
 # v3.95 - Added basename catch, made our arg handling better.
@@ -58,6 +59,17 @@ def usage():
 	print "Available Options:"
 	print "-v	Prints out the version"
 	print "-u	Updates to the newest version"
+
+# Function to remove all files from a directory since
+# shutil wipes out the folder too
+def wipe_folder(folder):
+	# Find all files in the folder
+	for i in os.listdir(folder):
+		# Get the full path
+		file_path = os.path.join(folder, i)
+		# If it's a file, delete it
+		if os.path.isfile(file_path):
+			os.unlink(file_path)
 
 # Update function, orignally written by David Cantrell
 def update_script():
@@ -262,7 +274,7 @@ def main():
 
 			# Remove all distfiles
 			print 'Removing distfiles from system.'
-			shutil.rmtree('/usr/portage/distfiles/')
+			wipefolder('/usr/portage/distfiles/')
 
 			print 'All distfiles have been deleted. Invoking etc-update to check for configuration updates.'
 			os.system("etc-update")
