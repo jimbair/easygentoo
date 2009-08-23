@@ -25,7 +25,7 @@
 #
 # All previous versions were pretty bad. Don't worry about them. =)
 #
-# Copyright (C) 2008  James Bair <james.d.bair@gmail.com>
+# Copyright (C) 2008-2009  James Bair <james.d.bair@gmail.com>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
