@@ -3,6 +3,8 @@
 # Python script to update Gentoo.
 # NOTE: DO NOT REMOVE THE ABOVE LINE! USED FOR SANITY CHECKING! =)
 #
+# v4.1  - Re-wrote update to find it's valid/rev info dynamically
+#       - Added some extra error checking to update function
 # v4.02 - Fixed a bug with dist-file removal
 # v4.01 - Finished and tested as working. Yey for Python!
 # v4.00 - Re-written in Python goodness with much help from David C.
@@ -12,11 +14,11 @@
 # v3.92 - Added a check to ensure script is being run on Gentoo
 # v3.91 - Fixed a formatting issue on revdep-rebuild
 # v3.9  - Added auto detection/notification of available updates
-#	   - Made the updater much more intelligent
+#	    - Made the updater much more intelligent
 # v3.8  - Added support to stop when package blocks are found
-#	   - Misc. formatting changes and small fixes
+#	    - Misc. formatting changes and small fixes
 # v3.72 - Migrated $dl to personal domain
-#	   - Added GPL License
+#	    - Added GPL License
 # v3.71 - A few small fixes
 # v3.7  - Fixed some output stuff
 # v3.6  - Added automatic makewhatis -u support
@@ -45,10 +47,11 @@ import sys
 import tempfile
 import urllib
 import shutil
+import re
 
 # Global variables
 # Keep the rev variable on the same line or update revLineNumber!
-rev = 4.01
+rev = 4.1
 prog = os.path.basename(sys.argv[0])
 
 # Usage
@@ -63,6 +66,7 @@ def usage():
 # Function to remove all files from a directory since
 # shutil wipes out the folder too
 def wipe_folder(folder):
+
 	# Find all files in the folder
 	for i in os.listdir(folder):
 		# Get the full path
@@ -70,6 +74,26 @@ def wipe_folder(folder):
 		# If it's a file, delete it
 		if os.path.isfile(file_path):
 			os.unlink(file_path)
+
+# Function to search for a regex-compatible string, grep style
+def findLine(pattern, list=[]):
+
+	# Used to return None if nothing is found at all
+	empty = True
+	# The line we're looking for
+	ourPattern = re.compile(pattern)
+	# Check each line for our pattern
+	for line in list:
+		line.strip()
+		ourResult = ourPattern.search(line)
+		# Found it! Return it and mark it as non-empty
+		if ourResult:
+				empty = False
+				return line
+
+	# Check if we found anything. Return None if so.
+	if empty:
+		return None
 
 # Update function, orignally written by David Cantrell
 def update_script():
@@ -98,33 +122,33 @@ def update_script():
 	# Rename our script to *.old
 	os.rename(dest, backup)
 	(fd, newscript) = tempfile.mkstemp(prefix=prog, dir=tmpdir)
-	(filename, headers) = urllib.urlretrieve(dl, newscript)
+	try:
+		(filename, headers) = urllib.urlretrieve(dl, newscript)
+	except:
+		hostname = dl.split('/')[2]
+		print "Unable to connect to %s - Exiting." % (hostname,)
+		os.unlink(newscript)
+		os.rename(backup, dest)
+		sys.exit(1)
 
 	# Download the script and store it into a list called lines
 	fp = open(newscript, 'r')
 	lines = fp.readlines()
 	fp.close()
 
-	# Check to see if what we downloaded is our update script.
-	valid = False
-	if lines[2] == '# Python script to update Gentoo.\n':
-		valid = True
+	# Verify our integrity
+	valid = findLine('^# Python script to update Gentoo.$',lines)
 
 	# If valid, check to see if it's newer.
-	if valid:
-		# Looking for our rev = 4.xx line
-		revLineNumber = 49
-		revLine = lines[revLineNumber]
+	if valid is not None:
+		revLine = findLine('^rev = ',lines)
 
-		# Split the line into name/value
-		revLine, newRev = revLine.split('=')
+		if revLine is not None:
+			# Split the line into name/value
+			revLine, newRev = revLine.split('=')
 
-		# Remove whitespace
-		revLine = revLine.strip()
-		newRev = newRev.strip()
-
-		# If this is rev, then we're good
-		if revLine == 'rev':
+			# Remove whitespace
+			newRev = newRev.strip()
 
 			# Need to make our new revision # a float
 			newRev = float(newRev)
@@ -136,10 +160,9 @@ def update_script():
 				os.rename(backup, dest)
 				sys.exit(0)
 
-		# If not, then the line has been moved. Print out message to fix this
+			# If not, then the line has been moved. Print out message to fix this
 		else:
-			print "Our revision is no longer on line", revLineNumber, "- Please update \
-this script to reflect this change."
+			print 'Unable to find our revision. This is a bug.'
 
 		# Move our new script into place and make it executable
 		shutil.move(newscript, dest)
@@ -154,7 +177,9 @@ this script to reflect this change."
 	else:
 		os.unlink(newscript)
 		os.rename(backup, dest)
-		print "The Gentoo update script failed to update."
+		print "Unable to find our integrity line."
+		print "Verify the data at:", dl
+		print "Exiting."
 		sys.exit(1)
 
 # Check for packages in our updates
@@ -179,9 +204,9 @@ def main():
 		sys.exit(1)
 
 	# Must be run on a Gentoo Linux machine only
-	if not os.path.isdir("/usr/portage/profiles/"):
-		sys.stderr.write("This script is being run on a non-Gentoo system. Exiting.\n")
-		sys.exit(1)
+	#if not os.path.isdir("/usr/portage/profiles/"):
+	#	sys.stderr.write("This script is being run on a non-Gentoo system. Exiting.\n")
+	#	sys.exit(1)
 
 	# Must be run with one argument or less
 	# the len must be two since python counts 0
@@ -244,9 +269,7 @@ def main():
 		manpageUpdates = True
 
 	# The following packages need updates
-	#print 'The following pacakges are available for update:'
-	#for each in updates:
-	#	print each
+	# Done using emerge for color preservation
 	os.system("emerge -uDpN world")
 	print '' # Done for formatting
 
