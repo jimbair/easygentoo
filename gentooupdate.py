@@ -297,7 +297,7 @@ def main():
 
 			# Remove all distfiles
 			print 'Removing distfiles from system.'
-			wipefolder('/usr/portage/distfiles/')
+			wipe_folder('/usr/portage/distfiles/')
 
 			print 'All distfiles have been deleted. Invoking etc-update to check for configuration updates.'
 			os.system("etc-update")
