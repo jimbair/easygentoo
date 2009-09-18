@@ -3,25 +3,27 @@
 # Python script to update Gentoo.
 # NOTE: DO NOT REMOVE THE ABOVE LINE! USED FOR SANITY CHECKING! =)
 #
-# v4.1  - Re-wrote update to find it's valid/rev info dynamically
-#       - Added some extra error checking to update function
-# v4.02 - Fixed a bug with dist-file removal
-# v4.01 - Finished and tested as working. Yey for Python!
-# v4.00 - Re-written in Python goodness with much help from David C.
-# v3.95 - Added basename catch, made our arg handling better.
-# v3.94 - Added usage as output instead of 'Input not understood.'
-# v3.93 - Added a check for curl when -u is called
-# v3.92 - Added a check to ensure script is being run on Gentoo
-# v3.91 - Fixed a formatting issue on revdep-rebuild
-# v3.9  - Added auto detection/notification of available updates
-#	    - Made the updater much more intelligent
-# v3.8  - Added support to stop when package blocks are found
-#	    - Misc. formatting changes and small fixes
-# v3.72 - Migrated $dl to personal domain
-#	    - Added GPL License
-# v3.71 - A few small fixes
-# v3.7  - Fixed some output stuff
-# v3.6  - Added automatic makewhatis -u support
+# v4.1.1 - Migrated dl path to github
+#          Changed to a correct numbering system
+# v4.1   - Re-wrote update to find it's valid/rev info dynamically
+#        - Added some extra error checking to update function
+# v4.02  - Fixed a bug with dist-file removal
+# v4.01  - Finished and tested as working. Yey for Python!
+# v4.00  - Re-written in Python goodness with much help from David C.
+# v3.95  - Added basename catch, made our arg handling better.
+# v3.94  - Added usage as output instead of 'Input not understood.'
+# v3.93  - Added a check for curl when -u is called
+# v3.92  - Added a check to ensure script is being run on Gentoo
+# v3.91  - Fixed a formatting issue on revdep-rebuild
+# v3.9   - Added auto detection/notification of available updates
+#	     - Made the updater much more intelligent
+# v3.8   - Added support to stop when package blocks are found
+#	     - Misc. formatting changes and small fixes
+# v3.72  - Migrated $dl to personal domain
+#	     - Added GPL License
+# v3.71  - A few small fixes
+# v3.7   - Fixed some output stuff
+# v3.6   - Added automatic makewhatis -u support
 #
 # All previous versions were pretty bad. Don't worry about them. =)
 #
