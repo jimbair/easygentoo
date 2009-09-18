@@ -99,7 +99,7 @@ def findLine(pattern, list=[]):
 def update_script():
 
 	# Our URL, current file and it's backup
-	dl = 'http://www.tsuehpsyde.com/scripts/python/gentooupdate.py'
+	dl = 'http://github.com/tsuehpsyde/easygentoo/raw/master/gentooupdate.py'
 	dest = os.path.realpath(sys.argv[0])
 	backup = "%s.old" % (dest,)
 
