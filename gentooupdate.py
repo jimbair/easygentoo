@@ -3,36 +3,37 @@
 # Python script to update Gentoo.
 # NOTE: DO NOT REMOVE THE ABOVE LINE! USED FOR SANITY CHECKING! =)
 #
-# v4.19  - And some more formatting that was lost in translation.
-# v4.18  - A few more formatting fixes.
-# v4.17  - Fixed a few formatting errors.
-#        - Changed usage() to return a string for stdout/err reasons
-# v4.16  - Set str(rev) for -v
-# v4.15  - Testing for stability/functionality
-#        - No more prints
-#        - Set some outputs to stderr as required
-#        - Set doc strings for our defs
-# v4.11  - Migrated dl path to github
-#          Updated to a more accurate numbering system
-# v4.10  - Re-wrote update to find it's valid/rev info dynamically
-#        - Added some extra error checking to update function
-# v4.02  - Fixed a bug with dist-file removal
-# v4.01  - Finished and tested as working. Yey for Python!
-# v4.00  - Re-written in Python goodness with much help from David C.
-# v3.95  - Added basename catch, made our arg handling better.
-# v3.94  - Added usage as output instead of 'Input not understood.'
-# v3.93  - Added a check for curl when -u is called
-# v3.92  - Added a check to ensure script is being run on Gentoo
-# v3.91  - Fixed a formatting issue on revdep-rebuild
-# v3.90  - Added auto detection/notification of available updates
-#	     - Made the updater much more intelligent
-# v3.80  - Added support to stop when package blocks are found
-#	     - Misc. formatting changes and small fixes
-# v3.72  - Migrated $dl to personal domain
-#	     - Added GPL License
-# v3.71  - A few small fixes
-# v3.70  - Fixed some output stuff
-# v3.60  - Added automatic makewhatis -u support
+# v4.20 - Fixed a bug in the package update check.
+# v4.19 - And some more formatting that was lost in translation.
+# v4.18   A few more formatting fixes.
+# v4.17 - Fixed a few formatting errors.
+#       - Changed usage() to return a string for stdout/err reasons
+# v4.16 - Set str(rev) for -v
+# v4.15 - Testing for stability/functionality
+#       - No more prints
+#       - Set some outputs to stderr as required
+#       - Set doc strings for our defs
+# v4.11 - Migrated dl path to github
+#         Updated to a more accurate numbering system
+# v4.10 - Re-wrote update to find it's valid/rev info dynamically
+#         Added some extra error checking to update function
+# v4.02 - Fixed a bug with dist-file removal
+# v4.01 - Finished and tested as working. Yey for Python!
+# v4.00 - Re-written in Python goodness with much help from David C.
+# v3.95 - Added basename catch, made our arg handling better.
+# v3.94 - Added usage as output instead of 'Input not understood.'
+# v3.93 - Added a check for curl when -u is called
+# v3.92 - Added a check to ensure script is being run on Gentoo
+# v3.91 - Fixed a formatting issue on revdep-rebuild
+# v3.90 - Added auto detection/notification of available updates
+#	- Made the updater much more intelligent
+# v3.80 - Added support to stop when package blocks are found
+#	- Misc. formatting changes and small fixes
+# v3.72 - Migrated $dl to personal domain
+#	- Added GPL License
+# v3.71 - A few small fixes
+# v3.70 - Fixed some output stuff
+# v3.60 - Added automatic makewhatis -u support
 #
 # All previous versions were pretty bad. Don't worry about them. =)
 #
@@ -61,13 +62,12 @@ import shutil
 import re
 
 # Global variables
-# Keep the rev variable on the same line or update revLineNumber!
 __author__ = "James Bair"
 __date__ = "Oct. 27, 2009"
-
-rev = 4.19
+rev = 4.20
 prog = os.path.basename(sys.argv[0])
 
+# Begin our defs
 def echo(string=''):
 	"""
 	Function to emulate echo -en type functionality since
@@ -276,7 +276,8 @@ def main():
 	# only 4 lines, no updates are available.
 	updatesAvailable = len(updates)
 	updatesAvailable -= 4
-	if updatesAvailable == 0:
+	# Just in case we get -1 or something.
+	if updatesAvailable <= 0:
 		echo('\nNo updates available. Exiting.\n')
 		sys.exit(0)
 	else:
