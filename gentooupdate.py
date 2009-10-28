@@ -3,6 +3,10 @@
 # Python script to update Gentoo.
 # NOTE: DO NOT REMOVE THE ABOVE LINE! USED FOR SANITY CHECKING! =)
 #
+# v4.15  - Testing for stability/functionality
+#        - No more prints
+#        - Set some outputs to stderr as required
+#        - Set doc strings for our defs
 # v4.11  - Migrated dl path to github
 #          Updated to a more accurate numbering system
 # v4.10  - Re-wrote update to find it's valid/rev info dynamically
@@ -53,22 +57,36 @@ import re
 
 # Global variables
 # Keep the rev variable on the same line or update revLineNumber!
-rev = 4.11
+__author__ = "James Bair"
+__date__ = "Oct. 27, 2009"
+
+rev = 4.20
 prog = os.path.basename(sys.argv[0])
 
-# Usage
+def echo(string=''):
+	"""
+	Function to emulate echo -en type functionality since
+	print acts weird at times and py3k changes print as well.
+	"""
+	sys.stdout.write(string)
+	sys.stdout.flush()
+
 def usage():
+	"""
+	Simple usage function.
+	"""
+	echo("Usage: " + prog + " [option]\n")
+	echo("If run without an option, it updates the system.\n\n")
+	echo("Available Options:\n")
+	echo("-v	Prints out the version\n")
+	echo("-u	Updates to the newest version\n")
 
-	print "Usage: " + prog + " [option]"
-	print "If run without an option, it updates the system.\n"
-	print "Available Options:"
-	print "-v	Prints out the version"
-	print "-u	Updates to the newest version"
-
-# Function to remove all files from a directory since
-# shutil wipes out the folder too
 def wipe_folder(folder):
-
+	"""
+	Function to remove all files from a directory since
+	shutil wipes out the folder too. Made to wipe out dist
+	files quickly since the built-in from Portage is slow.
+	"""
 	# Find all files in the folder
 	for i in os.listdir(folder):
 		# Get the full path
@@ -77,10 +95,11 @@ def wipe_folder(folder):
 		if os.path.isfile(file_path):
 			os.unlink(file_path)
 
-# Function to search for a regex-compatible string, grep style
-def findLine(pattern, list=[]):
-
-	# Used to return None if nothing is found at all
+def findLine(pattern='', list=[]):
+	"""
+	Function to search for a regex-compatible string, grep style
+	Used to return None if nothing is found at all
+	"""
 	empty = True
 	# The line we're looking for
 	ourPattern = re.compile(pattern)
@@ -97,9 +116,11 @@ def findLine(pattern, list=[]):
 	if empty:
 		return None
 
-# Update function, orignally written by David Cantrell
 def update_script():
-
+	"""
+	Function to update this script, gentooupdate.py.
+	Originally wrote by David Cantrell.
+	"""
 	# Our URL, current file and it's backup
 	dl = 'http://github.com/tsuehpsyde/easygentoo/raw/master/gentooupdate.py'
 	dest = os.path.realpath(sys.argv[0])
@@ -128,7 +149,7 @@ def update_script():
 		(filename, headers) = urllib.urlretrieve(dl, newscript)
 	except:
 		hostname = dl.split('/')[2]
-		print "Unable to connect to %s - Exiting." % (hostname,)
+		echo("Unable to connect to " + hostname + " - Exiting.")
 		os.unlink(newscript)
 		os.rename(backup, dest)
 		sys.exit(1)
@@ -157,14 +178,15 @@ def update_script():
 
 			# Verify our rev is older than the latest one downloaded
 			if rev >= newRev:
-				print 'Already updated to the latest version. Exiting.'
+				echo(prog + 'is already up-to-date.\n')
 				os.unlink(newscript)
 				os.rename(backup, dest)
 				sys.exit(0)
 
 			# If not, then the line has been moved. Print out message to fix this
 		else:
-			print 'Unable to find our revision. This is a bug.'
+			sys.stderr.write('Unable to find the version on the newly downloaded script.\n')
+			sys.exit(1)
 
 		# Move our new script into place and make it executable
 		shutil.move(newscript, dest)
@@ -172,21 +194,22 @@ def update_script():
 
 		# Delete the old one, and let everyone know we're done
 		os.unlink(backup)
-		print "The Gentoo update script has been updated. Exiting."
+		echo("You have upgaded " + prog + " from version " + str(rev) + " to " + str(newRev) + ".\n")
 		sys.exit(0)
 
 	# If not valid, abort.
 	else:
 		os.unlink(newscript)
 		os.rename(backup, dest)
-		print "Unable to find our integrity line."
-		print "Verify the data at:", dl
-		print "Exiting."
+		sys.stderr.write("Unable to find our integrity line.\n")
+		sys.stderr.write("Please verify the data here: " + dl + "\n")
 		sys.exit(1)
 
-# Check for packages in our updates
-# Usage: packagename, listo to check
-def isPackageInList(pkg, list=[]):
+def isPackageInList(pkg='', list=[]):
+	"""
+	Check for packages in our updates
+	Usage: package name as a string, list to check
+	"""
 
 	for item in list:
 		# Returns the byte your string can be found at
@@ -206,9 +229,9 @@ def main():
 		sys.exit(1)
 
 	# Must be run on a Gentoo Linux machine only
-	#if not os.path.isdir("/usr/portage/profiles/"):
-	#	sys.stderr.write("This script is being run on a non-Gentoo system. Exiting.\n")
-	#	sys.exit(1)
+	if not os.path.isdir("/usr/portage/profiles/"):
+		sys.stderr.write("This script is being run on a non-Gentoo system. Exiting.\n")
+		sys.exit(1)
 
 	# Must be run with one argument or less
 	# the len must be two since python counts 0
@@ -221,18 +244,17 @@ def main():
 		if sys.argv[1] == "-u":
 			update_script()
 		elif sys.argv[1] == "-v":
-			print "GentooUpdate v%s" % (rev,)
+			echo("GentooUpdate v" + rev)
 			sys.exit(0)
 		else:
 			sys.stderr.write(prog + ": unrecognized option '" + sys.argv[1] + "'\n")
-			# Not sure how to do >&2 with the following usage in Python =(
-			usage()
+			sys.stderr.write(usage())
 			sys.exit(1)
 
 	# Update portage.
-	print "Beginning rsync of portage."
+	echo("Beginning rsync of portage.\n\n")
 	os.system("emerge --sync")
-	print "Portage updated, checking for package updates."
+	echo("Portage updated, checking for package updates.\n")
 
 	# Need to save the output of emerge -uDpN world into a list
 	# Create a blank list to save the lines to
@@ -249,20 +271,20 @@ def main():
 	updatesAvailable = len(updates)
 	updatesAvailable -= 4
 	if updatesAvailable == 0:
-		print '\nNo updates available. Exiting.'
+		echo('\nNo updates available. Exiting.\n')
 		sys.exit(0)
 	else:
 		# Strip out the extra four lines and save as our updates list
 		updates = updates[4:]
 
-	print '\n', updatesAvailable, 'packages updates found!'
+	echo('\n' + str(updatesAvailable) + ' packages updates found!')
 
 	# See if we have any requirements before simply updating our packages
 	# Check for blocked packages
 	if isPackageInList('[blocks B', updates):
-		print 'WARNING: Blocked packages found by portage! Update cannot proceed. Packages found:'
+		echo('WARNING: Blocked packages found by portage! Update cannot proceed. Packages found:')
 		for each in updates:
-			print each
+			echo(each + '\n')
 		sys.exit(1)
 
 	# Check if man pages are going to get updated
@@ -273,7 +295,7 @@ def main():
 	# The following packages need updates
 	# Done using emerge for color preservation
 	os.system("emerge -uDpN world")
-	print '' # Done for formatting
+	echo('\n') # Done for formatting
 
 	# A loop to ask if you want to update. All forms of yes/no supported, and unknown responses restart the loop.
 	while True:
@@ -285,34 +307,36 @@ def main():
 
 		# Time to update the system!
 		if answer == 'yes':
-			print 'Updating packages in portage'
+			echo('Updating packages in portage\n')
 			os.system("emerge -uDN world")
 
 			# If man-pages updated, run makewhatis -u to update it's db
 			if manpageUpdates:
-				print 'Running makewhatis -u for updated man pages...'
+				echo('Running makewhatis -u for updated man pages...')
 				os.system("makewhatis -u")
+				echo('done!.\n')
 
 			# Check for and fix any dependency issues
-			print 'Checking Gentoo for package dependency errors.'
+			echo('Checking Gentoo for package dependency errors.\n')
 			os.system("revdep-rebuild")
 
 			# Remove all distfiles
-			print 'Removing distfiles from system.'
+			echo('Removing distfiles from system...')
 			wipe_folder('/usr/portage/distfiles/')
+			echo('done!\n\n')
 
-			print 'All distfiles have been deleted. Invoking etc-update to check for configuration updates.'
+			echo('Invoking etc-update to check for configuration updates.\n')
 			os.system("etc-update")
 
-			print 'All finished! Your Gentoo installation has been successfully updated.'
+			echo('All finished! Your Gentoo installation has been successfully updated.\n')
 			sys.exit(0)
 
 
 		elif answer == 'no':
-			print 'Portage update has been aborted.'
+			echo('Portage update has been aborted.\n')
 			sys.exit(0)
 		else:
-			print "Input '" + answer + "' not understood. Try again."
+			echo("Input '" + answer + "' not understood. Try again.")
 
 # Run main() if ran directly, but halt if ctrl+c is given
 if __name__ == "__main__":
