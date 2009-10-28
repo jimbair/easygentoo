@@ -341,7 +341,7 @@ def main():
 			echo('Portage update has been aborted.\n')
 			sys.exit(0)
 		else:
-			echo("Input '" + answer + "' not understood. Try again.")
+			echo("Input '" + answer + "' not understood. Try again.\n\n")
 
 # Run main() if ran directly, but halt if ctrl+c is given
 if __name__ == "__main__":
