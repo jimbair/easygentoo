@@ -3,6 +3,7 @@
 # Python script to update Gentoo.
 # NOTE: DO NOT REMOVE THE ABOVE LINE! USED FOR SANITY CHECKING! =)
 #
+# v4.16  - Set str(rev) for -v
 # v4.15  - Testing for stability/functionality
 #        - No more prints
 #        - Set some outputs to stderr as required
@@ -60,7 +61,7 @@ import re
 __author__ = "James Bair"
 __date__ = "Oct. 27, 2009"
 
-rev = 4.20
+rev = 4.16
 prog = os.path.basename(sys.argv[0])
 
 def echo(string=''):
@@ -244,7 +245,7 @@ def main():
 		if sys.argv[1] == "-u":
 			update_script()
 		elif sys.argv[1] == "-v":
-			echo("GentooUpdate v" + rev)
+			echo("GentooUpdate v" + str(rev))
 			sys.exit(0)
 		else:
 			sys.stderr.write(prog + ": unrecognized option '" + sys.argv[1] + "'\n")
