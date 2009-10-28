@@ -3,6 +3,8 @@
 # Python script to update Gentoo.
 # NOTE: DO NOT REMOVE THE ABOVE LINE! USED FOR SANITY CHECKING! =)
 #
+# v4.17  - Fixed a few formatting errors.
+#        - Changed usage() to return a string for stdout/err reasons
 # v4.16  - Set str(rev) for -v
 # v4.15  - Testing for stability/functionality
 #        - No more prints
@@ -61,7 +63,7 @@ import re
 __author__ = "James Bair"
 __date__ = "Oct. 27, 2009"
 
-rev = 4.16
+rev = 4.17
 prog = os.path.basename(sys.argv[0])
 
 def echo(string=''):
@@ -74,13 +76,14 @@ def echo(string=''):
 
 def usage():
 	"""
-	Simple usage function.
+	Simple usage function. Builds and returns a usage string.
 	"""
-	echo("Usage: " + prog + " [option]\n")
-	echo("If run without an option, it updates the system.\n\n")
-	echo("Available Options:\n")
-	echo("-v	Prints out the version\n")
-	echo("-u	Updates to the newest version\n")
+	usage = "Usage: " + prog + " [option]\n"
+	usage = usage + "If run without an option, it updates the system.\n\n"
+	usage = usage + "Available Options:\n"
+	usage = usage + "-v	Prints out the version\n"
+	usage = usage + "-u	Updates to the newest version\n"
+	return usage
 
 def wipe_folder(folder):
 	"""
@@ -179,7 +182,7 @@ def update_script():
 
 			# Verify our rev is older than the latest one downloaded
 			if rev >= newRev:
-				echo(prog + 'is already up-to-date.\n')
+				echo(prog + ' is already up-to-date.\n')
 				os.unlink(newscript)
 				os.rename(backup, dest)
 				sys.exit(0)
@@ -237,7 +240,7 @@ def main():
 	# Must be run with one argument or less
 	# the len must be two since python counts 0
 	if len(sys.argv) > 2:
-		usage()
+		echo(usage())
 		sys.exit(1)
 
 	# Start work with arguments if we have them
@@ -245,7 +248,7 @@ def main():
 		if sys.argv[1] == "-u":
 			update_script()
 		elif sys.argv[1] == "-v":
-			echo("GentooUpdate v" + str(rev))
+			echo("GentooUpdate v" + str(rev) + "\n")
 			sys.exit(0)
 		else:
 			sys.stderr.write(prog + ": unrecognized option '" + sys.argv[1] + "'\n")
