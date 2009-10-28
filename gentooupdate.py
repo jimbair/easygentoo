@@ -3,6 +3,7 @@
 # Python script to update Gentoo.
 # NOTE: DO NOT REMOVE THE ABOVE LINE! USED FOR SANITY CHECKING! =)
 #
+# v4.19  - And some more formatting that was lost in translation.
 # v4.18  - A few more formatting fixes.
 # v4.17  - Fixed a few formatting errors.
 #        - Changed usage() to return a string for stdout/err reasons
@@ -64,7 +65,7 @@ import re
 __author__ = "James Bair"
 __date__ = "Oct. 27, 2009"
 
-rev = 4.18
+rev = 4.19
 prog = os.path.basename(sys.argv[0])
 
 def echo(string=''):
@@ -322,18 +323,18 @@ def main():
 				echo('done!.\n')
 
 			# Check for and fix any dependency issues
-			echo('Checking Gentoo for package dependency errors.\n')
+			echo('\nChecking Gentoo for package dependency errors.\n\n')
 			os.system("revdep-rebuild")
 
 			# Remove all distfiles
-			echo('Removing distfiles from system...')
+			echo('\nRemoving distfiles from system...')
 			wipe_folder('/usr/portage/distfiles/')
 			echo('done!\n\n')
 
-			echo('Invoking etc-update to check for configuration updates.\n')
+			echo('Invoking etc-update to check for configuration updates.\n\n')
 			os.system("etc-update")
 
-			echo('All finished! Your Gentoo installation has been successfully updated.\n')
+			echo('\nAll finished! Your Gentoo installation has been successfully updated.\n')
 			sys.exit(0)
 
 
