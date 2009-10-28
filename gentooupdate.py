@@ -3,6 +3,7 @@
 # Python script to update Gentoo.
 # NOTE: DO NOT REMOVE THE ABOVE LINE! USED FOR SANITY CHECKING! =)
 #
+# v4.18  - A few more formatting fixes.
 # v4.17  - Fixed a few formatting errors.
 #        - Changed usage() to return a string for stdout/err reasons
 # v4.16  - Set str(rev) for -v
@@ -63,7 +64,7 @@ import re
 __author__ = "James Bair"
 __date__ = "Oct. 27, 2009"
 
-rev = 4.17
+rev = 4.18
 prog = os.path.basename(sys.argv[0])
 
 def echo(string=''):
@@ -258,7 +259,7 @@ def main():
 	# Update portage.
 	echo("Beginning rsync of portage.\n\n")
 	os.system("emerge --sync")
-	echo("Portage updated, checking for package updates.\n")
+	echo("\nPortage updated, checking for package updates.\n")
 
 	# Need to save the output of emerge -uDpN world into a list
 	# Create a blank list to save the lines to
@@ -281,7 +282,7 @@ def main():
 		# Strip out the extra four lines and save as our updates list
 		updates = updates[4:]
 
-	echo('\n' + str(updatesAvailable) + ' packages updates found!')
+	echo('\n' + str(updatesAvailable) + ' packages updates found!\n')
 
 	# See if we have any requirements before simply updating our packages
 	# Check for blocked packages
