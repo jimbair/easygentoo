@@ -3,6 +3,7 @@
 # Python script to update Gentoo.
 # NOTE: DO NOT REMOVE THE ABOVE LINE! USED FOR SANITY CHECKING! =)
 #
+# v4.21 - Made the bug catch from 4.2 more verbose if we get there.
 # v4.20 - Fixed a bug in the package update check.
 # v4.19 - And some more formatting that was lost in translation.
 # v4.18   A few more formatting fixes.
@@ -64,7 +65,7 @@ import re
 # Global variables
 __author__ = "James Bair"
 __date__ = "Oct. 27, 2009"
-rev = 4.20
+rev = 4.21
 prog = os.path.basename(sys.argv[0])
 
 # Begin our defs
@@ -87,7 +88,7 @@ def usage():
 	usage = usage + "-u	Updates to the newest version\n"
 	return usage
 
-def wipe_folder(folder):
+def wipe_folder(folder=''):
 	"""
 	Function to remove all files from a directory since
 	shutil wipes out the folder too. Made to wipe out dist
@@ -277,9 +278,18 @@ def main():
 	updatesAvailable = len(updates)
 	updatesAvailable -= 4
 	# Just in case we get -1 or something.
-	if updatesAvailable <= 0:
+	if updatesAvailable = 0:
 		echo('\nNo updates available. Exiting.\n')
 		sys.exit(0)
+	elif updatesAvailable < 0:
+		sys.stderr.write('\nERROR: Something has gone wrong when checking for available updates.\n')
+		sys.stderr.write('Length value given: ' + str(updatesAvailable))
+		sys.stderr.write('\nValues in list:\n\n')
+		count = 0
+		for i in updates:
+			count += 1
+			sys.stderr.write('Item #' + str(count) + ': ' i + '\n')
+		sys.exit(1)
 	else:
 		# Strip out the extra four lines and save as our updates list
 		updates = updates[4:]
