@@ -288,7 +288,7 @@ def main():
 		count = 0
 		for i in updates:
 			count += 1
-			sys.stderr.write('Item #' + str(count) + ': ' i + '\n')
+			sys.stderr.write('Item #' + str(count) + ': ' + i + '\n')
 		sys.exit(1)
 	else:
 		# Strip out the extra four lines and save as our updates list
