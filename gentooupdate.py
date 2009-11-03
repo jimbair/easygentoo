@@ -278,7 +278,7 @@ def main():
 	updatesAvailable = len(updates)
 	updatesAvailable -= 4
 	# Just in case we get -1 or something.
-	if updatesAvailable = 0:
+	if updatesAvailable == 0:
 		echo('\nNo updates available. Exiting.\n')
 		sys.exit(0)
 	elif updatesAvailable < 0:
