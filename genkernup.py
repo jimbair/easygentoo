@@ -6,7 +6,7 @@
 # (which I only end up with after using Quickstart), I don't
 # want to think about the kernel. So, to automate the
 # upgrade/rebuild process, we have this. Change the flags as
-# you see fit. --static is just a personal preference.
+# you see fit.
 #
 # Copyright (C) 2009  James Bair <james.d.bair@gmail.com>
 #
@@ -73,5 +73,5 @@ if status is not 0:
         sys.exit(1)
 
 # Build and install it
-os.system('genkernel --install --mountboot --bootloader=grub --static all')
+os.system('genkernel --install --mountboot --bootloader=grub all')
 sys.exit(0)
