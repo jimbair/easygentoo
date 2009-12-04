@@ -8,7 +8,7 @@
 # I do not build modules. =) I also do not use amd64, PPC or anything
 # else. Nor do I use lilo. Modify away!
 #
-# Note that uname -a doesn't give us linux- in front of the kernel 
+# Note that uname -r doesn't give us linux- in front of the kernel
 # version but /usr/src/* does. This causes some formatting/comparison
 # issues along the way which I remedy by moving stuff around. This 
 # can probably be done better, but I just fixed stuff as it came up.
@@ -99,7 +99,7 @@ else
 fi
 
 # Now, compare our symlink against our live kernel version. Just a safety check
-systemKernelVersion=$(echo linux-$(uname -a | cut -d ' ' -f 3-3))
+systemKernelVersion=$(echo linux-$(uname -r))
 sourceKernelVersion=$(echo $fullKernelPath | cut -d / -f 4-4)
 if [ "$systemKernelVersion" != "$sourceKernelVersion" ]; then
 	echo "ERROR: The kernel version for $kernelSymlink does not match the current system kernel." >&2
