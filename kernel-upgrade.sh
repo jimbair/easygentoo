@@ -1,16 +1,16 @@
 #!/bin/bash
 # Script to update a manually compiled Linux kernel in Gentoo.
-# 
+#
 # Currently only supports the x86 arch and grub on Gentoo Linux.
 #
 # This script is a bit specific to my needs, but I figured I could
-# GPL it for anyone to use and modify to their needs. For example, 
+# GPL it for anyone to use and modify to their needs. For example,
 # I do not build modules. =) I also do not use amd64, PPC or anything
 # else. Nor do I use lilo. Modify away!
 #
 # Note that uname -r doesn't give us linux- in front of the kernel
 # version but /usr/src/* does. This causes some formatting/comparison
-# issues along the way which I remedy by moving stuff around. This 
+# issues along the way which I remedy by moving stuff around. This
 # can probably be done better, but I just fixed stuff as it came up.
 #
 # 1.21 - Defined ${boot} properly in the grub config section
