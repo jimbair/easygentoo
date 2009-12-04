@@ -3,7 +3,7 @@ Create kernelpurge.py
         -find what's being removed
         -what's being used/protected
     -run eselect kernel list and see what's being used
-    -run uname -a and see what's being used
+    -run uname -r and see what's being used
     -verify we're running the same version as both
      protected by portage and chosen by eselect
 
