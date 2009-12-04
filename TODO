@@ -1,0 +1,19 @@
+Create kernelpurge.py
+    -run emerge --purge --pretend and
+        -find what's being removed
+        -what's being used/protected
+    -run eselect kernel list and see what's being used
+    -run uname -a and see what's being used
+    -verify we're running the same version as both
+     protected by portage and chosen by eselect
+
+    -When confirmed, do:
+        -emerge --purge
+        -Remove the following items from kernels
+         listed in the --purge --pretend:
+            -System.map, initrd, and vmlinuz from /boot/
+            -Source folders from /usr/src/
+            -Modules from /lib/modules/
+            -Entries from /menu/grub/menu.list
+
+    -Option to save previous kernel (maybe by default?)
