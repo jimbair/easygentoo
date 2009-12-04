@@ -1,8 +1,6 @@
 Welcome to EasyGentoo!
 
-This project is a collection of scripts which can make life easier when using Gentoo. Some scripts are helpful for most anyone (global system package updater) and some are more specialized to my personal needs (kernel upgrader). However, all scripts are licensed with the GPL v2 license, so you may use them or edit them as you need so you can get the job done. If you improve the script, by all means send those improvements my way!
-
-Currently, the scripts provided here are written in BASH, but there's a good chance these will be ported over to Python in the future. If you have any suggestions for other scripts you could use, let me know.
+This project is a collection of scripts which can make life easier when using Gentoo. Some scripts are helpful for most anyone (global system package updater) and some are more specialized to my personal needs (kernel upgrader). However, all scripts are licensed with the GPL v2 license, so you may use them or edit them as you need so you can get the job done. Feel free to fork, fix, and send those improvements my way!
 
 Cheers,
 
