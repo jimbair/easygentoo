@@ -205,7 +205,7 @@ def main():
             echo("GentooUpdate v%s\n" % (rev,))
             sys.exit(0)
         else:
-            sys.stderr.write("%s: unrecognized option '%s'\n" (prog, sys.argv[1]))
+            sys.stderr.write("%s: unrecognized option '%s'\n" % (prog, sys.argv[1]))
             sys.stderr.write(usage(prog))
             sys.exit(1)
 
