@@ -3,30 +3,6 @@
 # Python script to update Gentoo.
 # NOTE: DO NOT REMOVE THE ABOVE LINE! USED FOR SANITY CHECKING! =)
 #
-# v4.30 - Replaced sys.argv[0] with __file__
-#       - Now using spaces instead of tabs thanks to GvR
-#       - Killed isPackageInList(), not needed.
-#       - Removed BASH changelog
-#       - Removed the 'this' + str(that) stuff.
-# v4.21 - Made the bug catch from 4.2 more verbose if we get there.
-# v4.20 - Fixed a bug in the package update check.
-# v4.19 - And some more formatting that was lost in translation.
-# v4.18   A few more formatting fixes.
-# v4.17 - Fixed a few formatting errors.
-#       - Changed usage() to return a string for stdout/err reasons
-# v4.16 - Set str(rev) for -v
-# v4.15 - Testing for stability/functionality
-#       - No more prints
-#       - Set some outputs to stderr as required
-#       - Set doc strings for our defs
-# v4.11 - Migrated dl path to github
-#         Updated to a more accurate numbering system
-# v4.10 - Re-wrote update to find it's valid/rev info dynamically
-#         Added some extra error checking to update function
-# v4.02 - Fixed a bug with dist-file removal
-# v4.01 - Finished and tested as working. Yey for Python!
-# v4.00 - Re-written in Python goodness with much help from David C.
-#
 # All previous versions were pretty bad. Don't worry about them. =)
 #
 # Copyright (C) 2008-2009  James Bair <james.d.bair@gmail.com>
@@ -268,6 +244,12 @@ def main():
     else:
         # Strip out the extra four lines and save as our updates list
         updates = updates[4:]
+
+    # Bugfix - Says there are updates when there are none
+    for line in updates:
+        if 'Use eselect news to read news items' in line and updatesAvailable == 4:
+            echo("\nNo updates available. Exiting.\n")
+            sys.exit(0)
 
     echo("\n%s packages updates found!\n" % (updatesAvailable,))
 
