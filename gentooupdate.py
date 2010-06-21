@@ -32,7 +32,7 @@ import urllib
 # Global variables
 __author__ = "James Bair"
 __date__ = "Oct. 27, 2009"
-rev = 4.31
+rev = 4.32
 
 # Begin our defs
 def echo(string=''):
