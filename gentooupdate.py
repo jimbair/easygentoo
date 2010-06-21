@@ -32,7 +32,7 @@ import urllib
 # Global variables
 __author__ = "James Bair"
 __date__ = "Oct. 27, 2009"
-rev = 4.30
+rev = 4.31
 
 # Begin our defs
 def echo(string=''):
@@ -246,10 +246,11 @@ def main():
         updates = updates[4:]
 
     # Bugfix - Says there are updates when there are none
-    for line in updates:
-        if 'Use eselect news to read news items' in line and updatesAvailable == 4:
-            echo("\nNo updates available. Exiting.\n")
-            sys.exit(0)
+    if updatesAvailable == 4:
+        for line in updates:
+            if 'Use eselect news to read news items' in line:
+                echo("\nNo updates available. Exiting.\n")
+                sys.exit(0)
 
     echo("\n%s packages updates found!\n" % (updatesAvailable,))
 
