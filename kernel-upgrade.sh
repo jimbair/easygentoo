@@ -49,7 +49,7 @@ PATH='/usr/sbin:/usr/bin:/sbin:/bin'
 # Variables
 boot='/boot/'
 kernelSymlink='/usr/src/linux'
-version='1.3'
+version='1.31'
 newKernel="${kernelSymlink}/arch/x86/boot/bzImage"
 newConfig="${kernelSymlink}/.config"
 grubConf="${boot}grub/grub.conf"
