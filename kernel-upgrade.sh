@@ -8,11 +8,12 @@
 # I do not build modules. =) I also do not use amd64, PPC or anything
 # else. Nor do I use lilo. Modify away!
 #
-# Note that uname -r doesn't give us linux- in front of the kernel
+# Note that uname -a doesn't give us linux- in front of the kernel
 # version but /usr/src/* does. This causes some formatting/comparison
 # issues along the way which I remedy by moving stuff around. This
 # can probably be done better, but I just fixed stuff as it came up.
 #
+# 1.3  - Made more stuff dynamic.
 # 1.21 - Defined ${boot} properly in the grub config section
 # 1.2  - Migrated into github, corrected an echo syntax
 # 1.1  - Fixed sort -r bug by using ls -c instead
@@ -74,6 +75,91 @@ if [ ! -d /usr/portage/profiles/ ]; then
 	exit 1
 fi
 
+# Find our root partition
+root="$(mount | egrep '^/dev/[s|h]d[a-z][1-9] on / type ' | awk '{print $1}')"
+rootNum="$(mount | egrep '^/dev/[s|h]d[a-z][1-9] on / type ' | awk '{print $1}' | wc -l)"
+if [ -z "$root" ]; then
+    echo "Unable to find our root mount point. Exiting." >&2
+    exit 1
+elif [ $rootNum -ne 1 ]; then
+    echo "We have $rootNum results and only need 1." >&2
+    exit 1
+fi
+
+# Find our boot partition/device that grub needs. Example: hd0,0
+# The /boot should be using $boot but I really don't want to
+# escape this regex =)
+bootDev="$(mount | egrep '^/dev/[s|h]d[a-z][1-9] on /boot type ' | awk '{print $1}')"
+bootDevNum="$(mount | egrep '^/dev/[s|h]d[a-z][1-9] on /boot type ' | awk '{print $1}' | wc -l)"
+if [ -z "$bootDev" ]; then
+    echo "Unable to find our boot mount point. Exiting." >&2
+    exit 1
+elif [ $bootDevNum -ne 1 ]; then
+    echo "We have $bootDevNum results and we only need 1." >&2
+    exit 1
+fi
+
+# Now, find the device letter (a-z)
+bootLetter="${bootDev:7:1}"
+
+# Now find the letter (0-9)
+bootNumber="${bootDev:8:1}"
+
+# Only supporting 10 chars at this time.
+case $bootLetter in
+    a)
+    grubDev1=0
+    ;;
+
+    b)
+    grubDev1=1
+    ;;
+
+    c)
+    grubDev1=2
+    ;;
+
+    d)
+    grubDev1=3
+    ;;
+
+    e)
+    grubDev1=4
+    ;;
+
+    f)
+    grubDev1=5
+    ;;
+
+    g)
+    grubDev1=6
+    ;;
+
+    h)
+    grubDev1=7
+    ;;
+
+    i)
+    grubDev1=8
+    ;;
+
+    j)
+    grubDev1=9
+    ;;
+
+    *)
+    echo "Warning: Unsupported configuration. Boot drive letter is not a-j." >&2
+    exit 1
+    ;;
+
+esac
+
+# Subtract the boot number by 1 (since /dev/sda1 is 0,0; /dev/sda2 would be 0,1 etc)
+grubDev2="$((bootNumber-1))"
+
+# Now, patch it all together.
+grubRoot="hd${grubDev1},${grubDev2}"
+
 # Find our current kernel version attached to the $kernelSymlink symlink.
 # Make sure it exists
 if [ -e $kernelSymlink ]; then
@@ -99,7 +185,7 @@ else
 fi
 
 # Now, compare our symlink against our live kernel version. Just a safety check
-systemKernelVersion=$(echo linux-$(uname -r))
+systemKernelVersion=$(echo linux-$(uname -a | cut -d ' ' -f 3-3))
 sourceKernelVersion=$(echo $fullKernelPath | cut -d / -f 4-4)
 if [ "$systemKernelVersion" != "$sourceKernelVersion" ]; then
 	echo "ERROR: The kernel version for $kernelSymlink does not match the current system kernel." >&2
@@ -308,7 +394,7 @@ cat > $grubConf << EOTOP
 
 default 0
 timeout 3
-splashimage=(hd0,0)${boot}grub/splash.xpm.gz
+splashimage=($grubRoot)${boot}grub/splash.xpm.gz
 EOTOP
 
 # Time to generate our new Kernel config dynamically!
@@ -322,8 +408,8 @@ for i in $(seq $(ls bzImage* | wc -l)); do
 		echo "" >> $grubConf
 		echo "# $ourKernelVersion" >> $grubConf
 		echo "title Gentoo Linux $ourKernelVersion" >> $grubConf
-		echo "root (hd0,0)" >> $grubConf
-		echo "kernel ${boot}${ourKernel} root=/dev/sda3" >> $grubConf
+		echo "root ($grubRoot)" >> $grubConf
+		echo "kernel ${boot}${ourKernel} root=${root}" >> $grubConf
 	else
 		echo
 		echo "ERROR: Tried to generate config entry for ${boot}${ourKernel} which does not exist." >&2
