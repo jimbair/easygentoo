@@ -13,20 +13,6 @@
 # issues along the way which I remedy by moving stuff around. This
 # can probably be done better, but I just fixed stuff as it came up.
 #
-# 1.31 - Re-fixed a uname call. Oops!
-# 1.3  - Made more stuff dynamic.
-# 1.21 - Defined ${boot} properly in the grub config section
-# 1.2  - Migrated into github, corrected an echo syntax
-# 1.1  - Fixed sort -r bug by using ls -c instead
-#      - Added $PATH / $script / $kernelSymlink
-#      - Added -d check for /boot/
-#      - Added more sanity checking
-#        Thanks to David Cantrell for the help on 1.1
-#
-# 1.0  - Developed and deemed working after some testing.
-#
-# 0.1  - Development
-#
 # Copyright (C) 2009  James Bair <james.d.bair@gmail.com>
 #
 # This program is free software; you can redistribute it and/or
@@ -49,12 +35,12 @@ PATH='/usr/sbin:/usr/bin:/sbin:/bin'
 # Variables
 boot='/boot/'
 kernelSymlink='/usr/src/linux'
-version='1.31'
+version='1.32'
 newKernel="${kernelSymlink}/arch/x86/boot/bzImage"
 newConfig="${kernelSymlink}/.config"
 grubConf="${boot}grub/grub.conf"
 # Specify our script name.
-script=$(basename $0 2>&1)
+script="$(basename $0 2>&1)"
 if [ $? -ne 0 ]; then
 	script='kernel-upgrade.sh'
 fi
@@ -186,8 +172,8 @@ else
 fi
 
 # Now, compare our symlink against our live kernel version. Just a safety check
-systemKernelVersion=$(echo linux-$(uname -r))
-sourceKernelVersion=$(echo $fullKernelPath | cut -d / -f 4-4)
+systemKernelVersion="$(echo linux-$(uname -r))"
+sourceKernelVersion="$(echo $fullKernelPath | cut -d / -f 4-4)"
 if [ "$systemKernelVersion" != "$sourceKernelVersion" ]; then
 	echo "ERROR: The kernel version for $kernelSymlink does not match the current system kernel." >&2
 	echo "System Kernel: $systemKernelVersion" >&2
@@ -203,7 +189,7 @@ fi
 cd /usr/src/
 
 # Find the latest kernel - Ensure it's not the same as what's configured/running.
-latestKernelVersion=$(ls -c | grep -v 'linux$' | head -1)
+latestKernelVersion="$(ls -c | grep -v 'linux$' | head -1)"
 if [ -z "$latestKernelVersion" ]; then
 	echo "ERROR: Unable to find our latest kernel version! Exiting." >&2
 	exit 1
@@ -231,7 +217,7 @@ fi
 
 # This is the same as the change to latestKernelVersion later, but we need
 # the linux- still and we need to check for this issue earlier in our script.
-bootCheck=$(echo $latestKernelVersion | cut -d - -f 2-)
+bootCheck="$(echo $latestKernelVersion | cut -d - -f 2-)"
 # Start our checks for stuff in $boot
 if [ -d $boot ]; then
 	# Make sure $boot is mounted. If not, mount it.
@@ -349,7 +335,7 @@ fi
 # Time to copy over our new kernel + setup grub's config
 # strip the linux- from our kernel version for grub.
 cd $boot
-latestKernelVersion=$(echo $latestKernelVersion | cut -d - -f 2-)
+latestKernelVersion="$(echo $latestKernelVersion | cut -d - -f 2-)"
 
 # Copy over our files!
 echo -n "INFO: Installing new kernel into ${boot}..."
@@ -401,9 +387,9 @@ EOTOP
 # Time to generate our new Kernel config dynamically!
 for i in $(seq $(ls bzImage* | wc -l)); do
 	# Find our kernel (we are already in $boot)
-	ourKernel=$(ls -c bzImage* | head -${i} | tail -1)
+	ourKernel="$(ls -c bzImage* | head -${i} | tail -1)"
 	# Find the version (again, same as latestKernelVersion but dynamic for the loop
-	ourKernelVersion=$(echo $ourKernel | cut -d - -f 2-)
+	ourKernelVersion="$(echo $ourKernel | cut -d - -f 2-)"
 	# Verfiy the integrity of what we are generating
 	if [ -s "${boot}${ourKernel}" ]; then
 		echo "" >> $grubConf
