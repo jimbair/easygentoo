@@ -23,3 +23,5 @@
 emerge -pe world | egrep '^\[ebuild     U \]' | cut -d ']' -f 2- | cut -d '.' -f -1
 
 Need to drop the last dash (-) and all chars after it, and emerge -u them all.
+
+3. Make etc-update-diff.sh dynamic so it can work with 0001 or even 0009 files instead of only 0000. If the same config file has 2 updates in the queue, the # rises sequentially.
