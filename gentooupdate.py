@@ -32,7 +32,7 @@ import urllib
 # Global variables
 __author__ = "James Bair"
 __date__ = "Oct. 27, 2009"
-rev = 4.34
+rev = 4.35
 
 # Begin our defs
 def echo(string=''):
@@ -212,7 +212,7 @@ def main():
     # Update portage.
     echo("Beginning rsync of portage.\n\n")
     os.system("emerge --sync")
-    echo("\nPortage updated, checking for package updates.\n")
+    echo("\nPortage updated, checking for package updates.")
 
     # Need to save the output of emerge -uDpN world into a list
     # Create a blank list to save the lines to
@@ -253,9 +253,9 @@ def main():
 
     # Correct grammar is always nice. =)
     if updatesAvailable == 1:
-        echo("\n1 package update found!\n")
+        echo("\n\n1 package update found!\n")
     else:
-        echo("\n%s packages updates found!\n" % (updatesAvailable,))
+        echo("\n\n%s package updates found!\n" % (updatesAvailable,))
 
     # See if we have any requirements before simply updating our packages
     # Check for blocked packages
