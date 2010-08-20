@@ -32,7 +32,7 @@ import urllib
 # Global variables
 __author__ = "James Bair"
 __date__ = "Oct. 27, 2009"
-rev = 4.33
+rev = 4.34
 
 # Begin our defs
 def echo(string=''):
@@ -251,8 +251,11 @@ def main():
         # Strip out the extra four lines and save as our updates list
         updates = updates[4:]
 
-
-    echo("\n%s packages updates found!\n" % (updatesAvailable,))
+    # Correct grammar is always nice. =)
+    if updatesAvailable == 1:
+        echo("\n1 package update found!\n")
+    else:
+        echo("\n%s packages updates found!\n" % (updatesAvailable,))
 
     # See if we have any requirements before simply updating our packages
     # Check for blocked packages
