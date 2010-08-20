@@ -1,4 +1,4 @@
-Create kernelprune.py
+1. Create kernelprune.py
     -run emerge --prune --pretend and
         -find what's being removed
         -what's being used/protected
@@ -17,3 +17,9 @@ Create kernelprune.py
             -Entries from /menu/grub/menu.list
 
     -Option to save previous kernel (maybe by default?)
+
+2. Either create a shell script or merge into gentooupdate.py that finds package updates that portage's emerge -uDaN doesn't seem to find. Current shell script that can find these:
+
+emerge -pe world | egrep '^\[ebuild     U \]' | cut -d ']' -f 2- | cut -d '.' -f -1
+
+Need to drop the last dash (-) and all chars after it, and emerge -u them all.
