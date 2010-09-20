@@ -31,8 +31,8 @@ import urllib
 
 # Global variables
 __author__ = "James Bair"
-__date__ = "Oct. 27, 2009"
-rev = 4.35
+__date__ = "Sep. 19, 2010"
+rev = 4.36
 
 # Begin our defs
 def echo(string=''):
@@ -278,13 +278,12 @@ def main():
     # A loop to ask if you want to update. All forms of yes/no supported, and unknown responses restart the loop.
     while True:
 
-        # Ask user if they want to proceed, set text to lowercase
         answer = raw_input("Would you like to update Gentoo? (yes/no): ")
         answer = answer.strip()
         answer = answer.lower()
 
         # Time to update the system!
-        if answer == 'yes':
+        if answer == 'yes' or answer == 'y':
             echo('Updating packages in portage\n')
             os.system("emerge -uDN world")
 
@@ -303,16 +302,19 @@ def main():
             wipe_folder('/usr/portage/distfiles/')
             echo('done!\n\n')
 
+            # Check for cofiguration updates
             echo('Invoking etc-update to check for configuration updates.\n\n')
             os.system("etc-update")
 
             echo('\nAll finished! Your Gentoo installation has been successfully updated.\n')
             sys.exit(0)
 
-
-        elif answer == 'no':
+        # Looks like we had second thoughts.
+        elif answer == 'no' or answer == 'n':
             echo('Portage update has been aborted.\n')
             sys.exit(0)
+
+        # Anything else is invalid.
         else:
             echo("Input '%s' not understood. Try again.\n\n" % (answer,))
 
