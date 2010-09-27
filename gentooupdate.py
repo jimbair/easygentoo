@@ -32,7 +32,7 @@ import urllib
 # Global variables
 __author__ = "James Bair"
 __date__ = "Sep. 27, 2010"
-rev = 4.37
+rev = 4.38
 
 # Begin our defs
 def echo(string=''):
@@ -212,7 +212,7 @@ def main():
 
     # Update portage.
     echo("Beginning rsync of portage.\n\n")
-    #os.system("emerge --sync")
+    os.system("emerge --sync")
     echo("\nPortage updated, checking for package updates.")
 
     # Need to save the output of emerge -uDpN world into a list
