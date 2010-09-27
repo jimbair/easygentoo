@@ -31,8 +31,8 @@ import urllib
 
 # Global variables
 __author__ = "James Bair"
-__date__ = "Sep. 19, 2010"
-rev = 4.36
+__date__ = "Sep. 27, 2010"
+rev = 4.37
 
 # Begin our defs
 def echo(string=''):
@@ -180,6 +180,7 @@ def main():
 
     # Variables
     prog = os.path.basename(__file__)
+    manpageUpdates = False
 
     # Must be root to run this script.
     if os.getuid() != 0:
@@ -211,7 +212,7 @@ def main():
 
     # Update portage.
     echo("Beginning rsync of portage.\n\n")
-    os.system("emerge --sync")
+    #os.system("emerge --sync")
     echo("\nPortage updated, checking for package updates.")
 
     # Need to save the output of emerge -uDpN world into a list
@@ -224,15 +225,26 @@ def main():
     for line in sysCall.readlines():
         updates.append(line.strip())
 
+    # Check our updates for gotchas
+    for line in updates:
+        # Do not count the eselect news lines
+        if 'Use eselect news to read news items' in line:
+            updatesAvailable -= 4
+            continue
+        # Check if man pages are going to get updated
+        elif 'sys-apps/man-pages' in line:
+            manpageUpdates = True
+        # Stop if we have blockers.
+        elif '[blocks B' in line:
+            sys.stderr.write('WARNING: Blocked packages found by portage! Update cannot proceed. Packages found:\n')
+            for update in updates:
+                sys.stderr.write("%s\n" % (update,))
+            sys.exit(1)
+
     # The first 4 lines are output from emerge. If we get
     # only 4 lines, no updates are available.
     updatesAvailable = len(updates)
     updatesAvailable -= 4
-
-    # Do not count the eselect news lines
-    for line in updates:
-        if 'Use eselect news to read news items' in line:
-            updatesAvailable -= 4
 
     # Just in case we get -1 or something.
     if updatesAvailable == 0:
@@ -240,7 +252,7 @@ def main():
         sys.exit(0)
     elif updatesAvailable < 0:
         sys.stderr.write("\nERROR: Something has gone wrong when checking for available updates.\n")
-        sys.stderr.write("Length value given: %s" % (updatesAvailable,))
+        sys.stderr.write("Length value given: %d" % (updatesAvailable,))
         sys.stderr.write("\nValues in list:\n\n")
         count = 0
         for i in updates:
@@ -257,18 +269,6 @@ def main():
     else:
         echo("\n\n%s package updates found!\n" % (updatesAvailable,))
 
-    # See if we have any requirements before simply updating our packages
-    # Check for blocked packages
-    if '[blocks B' in updates:
-        echo('WARNING: Blocked packages found by portage! Update cannot proceed. Packages found:')
-        for each in updates:
-            echo("%s\n" % (each,))
-        sys.exit(1)
-
-    # Check if man pages are going to get updated
-    manpageUpdates = False
-    if 'sys-apps/man-pages' in updates:
-        manpageUpdates = True
 
     # The following packages need updates
     # Done using emerge for color preservation
@@ -291,7 +291,7 @@ def main():
             if manpageUpdates:
                 echo('Running makewhatis -u for updated man pages...')
                 os.system("makewhatis -u")
-                echo('done!.\n')
+                echo('done!\n')
 
             # Check for and fix any dependency issues
             echo('\nChecking Gentoo for package dependency errors.\n\n')
