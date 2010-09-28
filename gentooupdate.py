@@ -32,7 +32,7 @@ import urllib
 # Global variables
 __author__ = "James Bair"
 __date__ = "Sep. 27, 2010"
-rev = 4.38
+rev = 4.39
 
 # Begin our defs
 def echo(string=''):
@@ -287,12 +287,6 @@ def main():
             echo('Updating packages in portage\n')
             os.system("emerge -uDN world")
 
-            # If man-pages updated, run makewhatis -u to update it's db
-            if manpageUpdates:
-                echo('Running makewhatis -u for updated man pages...')
-                os.system("makewhatis -u")
-                echo('done!\n')
-
             # Check for and fix any dependency issues
             echo('\nChecking Gentoo for package dependency errors.\n\n')
             os.system("revdep-rebuild")
@@ -305,6 +299,12 @@ def main():
             # Check for cofiguration updates
             echo('Invoking etc-update to check for configuration updates.\n\n')
             os.system("etc-update")
+
+            # If man-pages updated, run makewhatis -u to update it's db
+            if manpageUpdates:
+                echo('Running makewhatis -u for updated man pages...')
+                os.system("makewhatis -u")
+                echo('done!\n')
 
             echo('\nAll finished! Your Gentoo installation has been successfully updated.\n')
             sys.exit(0)
