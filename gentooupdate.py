@@ -31,8 +31,8 @@ import urllib
 
 # Global variables
 __author__ = "James Bair"
-__date__ = "Sep. 27, 2010"
-rev = 4.39
+__date__ = "Sep. 29, 2010"
+rev = 4.40
 
 # Begin our defs
 def echo(string=''):
@@ -246,10 +246,11 @@ def main():
     updatesAvailable = len(updates)
     updatesAvailable -= 4
 
-    # Just in case we get -1 or something.
+    # Check if we have any updates.
     if updatesAvailable == 0:
         echo("\nNo updates available. Exiting.\n")
         sys.exit(0)
+    # Just in case we get -1 or something.
     elif updatesAvailable < 0:
         sys.stderr.write("\nERROR: Something has gone wrong when checking for available updates.\n")
         sys.stderr.write("Length value given: %d" % (updatesAvailable,))
@@ -259,16 +260,12 @@ def main():
             count += 1
             sys.stderr.write("Item #%s': %s\n" % (count, i))
         sys.exit(1)
-    else:
-        # Strip out the extra four lines and save as our updates list
-        updates = updates[4:]
 
     # Correct grammar is always nice. =)
     if updatesAvailable == 1:
         echo("\n\n1 package update found!\n")
     else:
         echo("\n\n%s package updates found!\n" % (updatesAvailable,))
-
 
     # The following packages need updates
     # Done using emerge for color preservation
