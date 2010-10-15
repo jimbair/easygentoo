@@ -31,8 +31,8 @@ import urllib
 
 # Global variables
 __author__ = "James Bair"
-__date__ = "Sep. 29, 2010"
-rev = 4.40
+__date__ = "Oct. 14, 2010"
+rev = 4.41
 
 # Begin our defs
 def echo(string=''):
@@ -85,6 +85,37 @@ def findLine(pattern='', list=[]):
 
     # If we found nothing, return None
     return None
+
+def findMissingUpdates():
+    """
+    Function to search for updates that 'emerge -uDaN world' misses
+    """
+    # Check for any missed updates in portage
+    echo('\nChecking for any updates portage missed...')
+    missedUpdates = []
+    secondPass = os.popen("emerge -ep world", "r")
+    for line in secondPass.readlines():
+        if ' U ' in line:
+            missedUpdates.append(line.strip())
+    echo('done.\n\n')
+    if missedUpdates:
+        emergeMe = []
+        updatesNum = len(missedUpdates)
+        if updatesNum == 1:
+            echo('Found the following missed update:\n')
+        else:
+            echo('Found the following %s missed updates:\n' % (updateNum,))
+
+        for line in missedUpdates:
+            package = line.split()[3]
+            echo('%s\n' % (package,))
+            emergeMe.append(package)
+            echo('\nUpdating the above packages.\n\n')
+            for package in emergeMe:
+                os.system('emerge -u =%s' % (package,))
+    else:
+        echo('No missed packages found.\n\n')
+
 
 def update_script(prog):
     """
@@ -212,7 +243,7 @@ def main():
 
     # Update portage.
     echo("Beginning rsync of portage.\n\n")
-    os.system("emerge --sync")
+    #os.system("emerge --sync")
     echo("\nPortage updated, checking for package updates.")
 
     # Need to save the output of emerge -uDpN world into a list
@@ -224,6 +255,9 @@ def main():
     # Go through and put each line in updates
     for line in sysCall.readlines():
         updates.append(line.strip())
+
+    # Find the # of lines
+    updatesAvailable = len(updates)
 
     # Check our updates for gotchas
     for line in updates:
@@ -243,12 +277,15 @@ def main():
 
     # The first 4 lines are output from emerge. If we get
     # only 4 lines, no updates are available.
-    updatesAvailable = len(updates)
     updatesAvailable -= 4
 
     # Check if we have any updates.
     if updatesAvailable == 0:
-        echo("\nNo updates available. Exiting.\n")
+        echo("\n\nNo updates found.\n")
+	# This is a hack. This needs to do all the revdep-rebuild stuff
+	# Need to make those bits modular and check for a return from
+	# this function.
+        findMissingUpdates()
         sys.exit(0)
     # Just in case we get -1 or something.
     elif updatesAvailable < 0:
@@ -283,6 +320,9 @@ def main():
         if answer == 'yes' or answer == 'y':
             echo('Updating packages in portage\n')
             os.system("emerge -uDN world")
+
+            # Check for missed updates
+            findMissingUpdates()
 
             # Check for and fix any dependency issues
             echo('\nChecking Gentoo for package dependency errors.\n\n')
