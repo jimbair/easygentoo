@@ -114,7 +114,7 @@ def findMissingUpdates():
             for package in emergeMe:
                 os.system('emerge -u =%s' % (package,))
     else:
-        echo('No missed packages found.\n\n')
+        echo('No missed packages found.\n')
 
 
 def update_script(prog):
