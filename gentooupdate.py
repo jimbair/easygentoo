@@ -104,7 +104,7 @@ def findMissingUpdates():
         if updatesNum == 1:
             echo('Found the following missed update:\n')
         else:
-            echo('Found the following %s missed updates:\n' % (updateNum,))
+            echo('Found the following %s missed updates:\n' % (updatesNum,))
 
         for line in missedUpdates:
             package = line.split()[3]
