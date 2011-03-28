@@ -31,8 +31,8 @@ import urllib
 
 # Global variables
 __author__ = "James Bair"
-__date__ = "Oct. 14, 2010"
-rev = 4.42
+__date__ = "Mar. 28, 2011"
+rev = 4.43
 
 # Begin our defs
 def echo(string=''):
