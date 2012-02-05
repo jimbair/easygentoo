@@ -3,13 +3,12 @@
 # Re-written to support multiple arches, as well as Rackspace Cloud.
 #
 # This script is a bit specific to my needs, but I figured I could
-# GPL it for anyone to use and modify to their needs. For example,
-# I do not build modules. Modify away!
+# GPL it for anyone to use and modify to their needs. I try to cover
+# anyone building their own kernel manually via make menuconfig.
 #
 # Note that uname -r doesn't give us linux- in front of the kernel
 # version but /usr/src/* does. This causes some formatting/comparison
-# issues along the way which I remedy by moving stuff around. This
-# can probably be done better, but I just fixed stuff as it came up.
+# issues along the way which I remedy by moving stuff around as I go.
 #
 # Copyright (C) 2012  James Bair <james.d.bair@gmail.com>
 #
