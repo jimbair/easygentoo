@@ -65,14 +65,14 @@ mountFinder(){
     # Dig in a bit for symlinks
     if [ -n "${mountpoint}" ]; then
         symcheck=$(ls -l $mountpoint | awk '$10 ~ /\->/ {print $NF}')
-    if [ -z "${symcheck}" ]; then
-        echo "ERROR: Verifying against a symlink failed - please debug." >&2
-        exit 1
-    fi
+        if [ -z "${symcheck}" ]; then
+            echo "ERROR: Verifying against a symlink failed - please debug." >&2
+            exit 1
+        fi
 
         if [ "${symcheck}" != "${mountpoint:5}" ]; then
             mountpoint="/dev/${symcheck}"
-    fi
+        fi
     fi
 
     # Note a null response is okay =)
