@@ -441,7 +441,7 @@ splashimage=($grubRoot)${boot}grub/splash.xpm.gz
 EOTOP
 
 # Time to generate our new Kernel config dynamically!
-# Make sure we find kernsl!
+# Make sure we find kernels!
 if [ -z "$(ls kernel-*)" ]; then
     echo "ERROR: Unable to find our kernels! Exiting." >&2
     exit 1
