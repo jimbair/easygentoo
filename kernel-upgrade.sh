@@ -354,14 +354,22 @@ else
     echo "SUCCESS: Upgraded our config file successfully!"
 fi
 
-# Now, build our kernel - Modules disabled by personal preference so
-# no need to run make modules_install per Gentoo Handbook.
+# Now, build our kernel and modules. Shouldn't cause issues if no modules
+# are needed.
 make
 if [ $? -ne 0 ]; then
     echo "ERROR: Building our kernel failed. Exiting." >&2
     exit 1
 else
     echo "SUCCESS: Kernel built successfully!"
+fi
+
+make modules_install
+if [ $? -ne 0 ]; then
+    echo "ERROR: Building our kernel modules failed. Exiting." >&2
+    exit 1
+else
+    echo "SUCCESS: Kernel modules built successfully!"
 fi
 
 # Go back up a directory
