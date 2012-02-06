@@ -40,7 +40,7 @@ fi
 
 boot='/boot/'
 kernelSymlink='/usr/src/linux'
-version='2.00'
+version='2.01'
 newKernel="${kernelSymlink}/arch/${arch}/boot/bzImage"
 newConfig="${kernelSymlink}/.config"
 grubConf="${boot}grub/grub.conf"
@@ -62,8 +62,8 @@ mountFinder(){
     exit 1
     fi
 
-    # Dig in a bit for symlinks
-    if [ -n "${mountpoint}" ]; then
+    # Dig in a bit for symlinks if needed.
+    if [ "$(ls -l $mountpoint | wc -w)" -eq 11 ]; then
         symcheck=$(ls -l $mountpoint | awk '$10 ~ /\->/ {print $NF}')
         if [ -z "${symcheck}" ]; then
             echo "ERROR: Verifying against a symlink failed - please debug." >&2
