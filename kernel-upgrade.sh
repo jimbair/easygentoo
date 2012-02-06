@@ -46,7 +46,7 @@ newConfig="${kernelSymlink}/.config"
 grubConf="${boot}grub/grub.conf"
 
 # Specify our script name.
-script="$(basename $0 2>&1)"
+script="$(basename $0 2>/dev/null)"
 if [ $? -ne 0 ]; then
     script='kernel-upgrade.sh'
 fi
