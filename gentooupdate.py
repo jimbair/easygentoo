@@ -22,6 +22,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 # Modules
+import commands
 import os
 import re
 import shutil
@@ -32,7 +33,7 @@ import urllib
 # Global variables
 __author__ = "James Bair"
 __date__ = "Mar. 28, 2011"
-rev = 4.43
+rev = 4.44
 
 # Begin our defs
 def echo(string=''):
@@ -250,7 +251,12 @@ def main():
     # Create a blank list to save the lines to
     updates = []
     # Run the command itself
-    sysCall = os.popen("emerge -uDpN world", "r")
+    status, sysCall = commands.getstatusoutput("emerge -uDpN world")
+
+    # Check for unclean exit code from emerge
+    if status:
+    	sys.stderr.write("ERROR: emerge returned non-zero exit status.\n")
+        sys.exit(status)
 
     # Go through and put each line in updates
     for line in sysCall.readlines():
