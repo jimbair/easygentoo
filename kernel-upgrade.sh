@@ -241,7 +241,7 @@ fi
 cd /usr/src/
 
 # Find the latest kernel - Ensure it's not the same as what's configured/running.
-latestKernelVersion="$(ls -c | grep -v 'linux$' | head -1)"
+latestKernelVersion="$(ls -c | grep -v 'linux$' | grep -v 'rpm' | head -1)"
 if [ -z "$latestKernelVersion" ]; then
     echo "ERROR: Unable to find our latest kernel version! Exiting." >&2
     exit 1
