@@ -336,16 +336,17 @@ cp ${sourceKernelVersion}/.config ${latestKernelVersion}/.config
 cd $latestKernelVersion
 
 # Print a message to the screen.
-echo
-echo "*****************************************************************"
-echo "****Going to run make oldconfig to migrate our kernel config.****"
-echo "***This requires you to give it answers to new kernel options!***"
-echo "*****************************************************************"
-echo
-sleep 5
+# No longer in use but leaving around for now.
+#echo
+#echo "*****************************************************************"
+#echo "****Going to run make oldconfig to migrate our kernel config.****"
+#echo "***This requires you to give it answers to new kernel options!***"
+#echo "*****************************************************************"
+#echo
+#sleep 5
 
-# Migrate the config to our new kernel
-make oldconfig
+# Migrate the config to our new kernel and accept any new defaults
+make olddefconfig
 if [ $? -ne 0 ]; then
     echo "ERROR: make oldconfig errored out unexpectedly. Exiting." >&2
     exit 1
