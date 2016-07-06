@@ -356,7 +356,8 @@ fi
 
 # Now, build our kernel and modules. Shouldn't cause issues if no modules
 # are needed.
-make
+procNum=$(echo $((`grep -c vendor_id /proc/cpuinfo` + 1)))
+make -j${procNum}
 if [ $? -ne 0 ]; then
     echo "ERROR: Building our kernel failed. Exiting." >&2
     exit 1
