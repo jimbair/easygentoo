@@ -4,6 +4,7 @@
 # NOTE: DO NOT REMOVE THE ABOVE LINE! USED FOR SANITY CHECKING! =)
 #
 # All previous versions were pretty bad. Don't worry about them. =)
+# This was my first ever Python project; be gentle! <3
 #
 # Copyright (C) 2008-2009  James Bair <james.d.bair@gmail.com>
 #
