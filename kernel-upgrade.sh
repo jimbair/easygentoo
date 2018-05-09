@@ -30,20 +30,21 @@
 PATH='/usr/sbin:/usr/bin:/sbin:/bin'
 
 # Variables
+boot='/boot/'
+kernOpts=''
+kernelSymlink='/usr/src/linux'
+version='2.02'
+newKernel="${kernelSymlink}/arch/${arch}/boot/bzImage"
+newConfig="${kernelSymlink}/.config"
+grubConf="${boot}grub/grub.conf"
+
 arch="$(uname -m)"
 if [ -z "${arch}" ]; then
     echo "ERROR: Unable to determine arch. Exiting." >&2
     exit 1
-else
-    echo "INFO: Architecture is ${arch}"
 fi
 
-boot='/boot/'
-kernelSymlink='/usr/src/linux'
-version='2.01'
-newKernel="${kernelSymlink}/arch/${arch}/boot/bzImage"
-newConfig="${kernelSymlink}/.config"
-grubConf="${boot}grub/grub.conf"
+echo "INFO: Architecture is ${arch}"
 
 # Specify our script name.
 script="$(basename $0 2>/dev/null)"
@@ -105,8 +106,6 @@ fi
 grep -q ' ro console=hvc0' ${grubConf}
 if [ $? -eq 0 ]; then
     kernOpts='ro console=hvc0'
-else
-    kernOpts=''
 fi
 
 # Find our root partition
@@ -114,9 +113,9 @@ root="$(mountFinder /)"
 if [ -z "$root" ]; then
     echo "ERROR: Unable to find our root mount point. Exiting." >&2
     exit 1
-else
-    echo "INFO: Found root filesystem partition ${root}"
 fi
+
+echo "INFO: Found root filesystem partition ${root}"
 
 # Find our boot partition/device that grub needs. Example: hd0,0
 # Note $boot is used above, which is why the name differs from $root
@@ -127,9 +126,9 @@ if [ -z "$bootDev" ]; then
     bootDev="${root}"
     sleep 2
     echo
-else
-    echo "INFO: Found $boot filesystem partition $bootDev"
 fi
+
+echo "INFO: Found $boot filesystem partition $bootDev"
 
 # Done to dynamically support both physical partitions like /dev/sda1 as 
 # well as Rackspace Cloud servers like /dev/xvda1.
@@ -233,9 +232,10 @@ if [ "$systemKernelVersion" != "$sourceKernelVersion" ]; then
     echo "Chances are you've already updated the kernel and have not yet rebooted the system." >&2
     echo "To keep from causing too much confusion, please reboot and try again." >&2
     exit 1
-else
-    echo "SUCCESS: Both Source & System kernels match: $sourceKernelVersion"
 fi
+
+echo "SUCCESS: Both Source & System kernels match: $sourceKernelVersion"
+
 
 # Move into /usr/src/ since we're going to be working in here.
 cd /usr/src/
@@ -245,17 +245,24 @@ latestKernelVersion="$(ls -c | grep -v 'linux$' | grep -v 'rpm' | head -1)"
 if [ -z "$latestKernelVersion" ]; then
     echo "ERROR: Unable to find our latest kernel version! Exiting." >&2
     exit 1
-else
-    echo "SUCCESS: Found latest kernel version: $latestKernelVersion"
+fi
+
+echo "SUCCESS: Found latest kernel version: $latestKernelVersion"
+
+# Make sure our running kernel is there
+if [ ! -s ${sourceKernelVersion}/.config ]; then
+     echo "ERROR: Unable to find our current kernel config! Exiting." >&2
+     exit 1
 fi
 
 # Make sure the latest version is not the same as what we're currently running.
 if [ "$sourceKernelVersion" == "$latestKernelVersion" ]; then
     echo "INFO: There are no new kernel versions to install. Exiting."
     exit 0
-else
-    echo "SUCCESS: Latest kernel version $latestKernelVersion newer than System kernel!"
 fi
+
+echo "SUCCESS: Latest kernel version $latestKernelVersion newer than System kernel!"
+
 
 # Check for .config in our new kernel directory
 if [ -s ${latestKernelVersion}/.config ]; then
@@ -311,9 +318,9 @@ cd $boot
 if [ -n "$(ls | grep $bootCheck)" ]; then
     echo "ERROR: The kernel you are trying to upgrade to is already installed! Exiting." >&2
     exit 1
-else
-    echo "SUCCESS: Kernel $latestKernelVersion not installed in $boot"
 fi
+
+echo "SUCCESS: Kernel $latestKernelVersion not installed in $boot"
 
 # If we get here, we have passed all checks.
 echo "SUCCESS: All clear! We are ready to upgrade your system kernel:
@@ -350,9 +357,9 @@ make olddefconfig
 if [ $? -ne 0 ]; then
     echo "ERROR: make oldconfig errored out unexpectedly. Exiting." >&2
     exit 1
-else
-    echo "SUCCESS: Upgraded our config file successfully!"
 fi
+
+echo "SUCCESS: Upgraded our config file successfully!"
 
 # Now, build our kernel and modules. Shouldn't cause issues if no modules
 # are needed.
@@ -361,17 +368,17 @@ make -j${procNum}
 if [ $? -ne 0 ]; then
     echo "ERROR: Building our kernel failed. Exiting." >&2
     exit 1
-else
-    echo "SUCCESS: Kernel built successfully!"
 fi
+
+echo "SUCCESS: Kernel built successfully!"
 
 make modules_install
 if [ $? -ne 0 ]; then
     echo "ERROR: Building our kernel modules failed. Exiting." >&2
     exit 1
-else
-    echo "SUCCESS: Kernel modules built successfully!"
 fi
+
+echo "SUCCESS: Kernel modules built successfully!"
 
 # Go back up a directory
 cd /usr/src/
@@ -387,6 +394,7 @@ else
     echo "ERROR: Removal of symlink failed. Exiting." >&2
     exit 1
 fi
+
 echo -n "Creating new symlink..."
 ln -s $latestKernelVersion linux
 if [ $? -eq 0 ]; then
