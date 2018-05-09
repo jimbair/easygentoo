@@ -31,12 +31,11 @@ PATH='/usr/sbin:/usr/bin:/sbin:/bin'
 
 # Variables
 boot='/boot/'
+grubConf="${boot}grub/grub.conf"
 kernOpts=''
 kernelSymlink='/usr/src/linux'
-version='2.02'
-newKernel="${kernelSymlink}/arch/${arch}/boot/bzImage"
 newConfig="${kernelSymlink}/.config"
-grubConf="${boot}grub/grub.conf"
+version='2.03'
 
 arch="$(uname -m)"
 if [ -z "${arch}" ]; then
@@ -45,6 +44,8 @@ if [ -z "${arch}" ]; then
 fi
 
 echo "INFO: Architecture is ${arch}"
+
+newKernel="${kernelSymlink}/arch/${arch}/boot/bzImage"
 
 # Specify our script name.
 script="$(basename $0 2>/dev/null)"
