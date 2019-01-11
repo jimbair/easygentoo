@@ -1,8 +1,8 @@
 #!/bin/bash
 # Script to show the changes between config files for Gentoo
-# v0.1 - Initial script
+# v0.2 - Initial script
 # Jim Bair 4/21/2009
-newConfigs=$(find /etc/* -type f -name '._cfg0000_*' -print)
+newConfigs=$(find /etc/ -type f -name '._cfg0000*' -print)
 
 if [ -n "$newConfigs" ]; then
 	echo -e "Found new config files. Proceeding.\n"
