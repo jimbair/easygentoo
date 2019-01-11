@@ -31,11 +31,11 @@ PATH='/usr/sbin:/usr/bin:/sbin:/bin'
 
 # Variables
 boot='/boot/'
-grubConf="${boot}grub/grub.conf"
+grubConf="${boot}grub/grub.cfg"
 kernOpts=''
 kernelSymlink='/usr/src/linux'
 newConfig="${kernelSymlink}/.config"
-version='2.03'
+version='2.04'
 
 arch="$(uname -m)"
 if [ -z "${arch}" ]; then
