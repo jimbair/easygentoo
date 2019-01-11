@@ -446,45 +446,10 @@ fi
 
 # Create our config file framework
 echo -n "INFO: Generating new ${grubConf}..."
-touch $grubConf
-cat > $grubConf << EOTOP
-# grub.conf - Generated dynamically on $(date)
-# Upgraded from $sourceKernelVersion to linux-${latestKernelVersion}
-# $script v${version}
-# Script Author: Jim Bair
-
-default 0
-timeout 3
-splashimage=($grubRoot)${boot}grub/splash.xpm.gz
-EOTOP
-
-# Time to generate our new Kernel config dynamically!
-# Make sure we find kernels!
-if [ -z "$(ls kernel-*)" ]; then
-    echo "ERROR: Unable to find our kernels! Exiting." >&2
-    exit 1
-fi
-
-for i in $(seq $(ls kernel-* | wc -l)); do
-    # Find our kernel (we are already in $boot)
-    ourKernel="$(ls -c kernel-* | head -${i} | tail -1)"
-    # Find the version (again, same as latestKernelVersion but dynamic for the loop
-    ourKernelVersion="$(echo $ourKernel | cut -d - -f 2-)"
-    # Verfiy the integrity of what we are generating
-    if [ -s "${boot}${ourKernel}" ]; then
-        echo "" >> $grubConf
-        echo "# $ourKernelVersion" >> $grubConf
-        echo "title Gentoo Linux $ourKernelVersion" >> $grubConf
-        echo "root ($grubRoot)" >> $grubConf
-        echo "kernel ${boot}${ourKernel} root=${root} ${kernOpts}" >> $grubConf
-    else
-        echo
-        echo "ERROR: Tried to generate config entry for ${boot}${ourKernel} which does not exist." >&2
-        echo "This is more than likely a bug. Exiting." >&2
-        exit 1
-    fi
-done
+grub-mkconfig -o ${grubConf}
 echo 'done.'
+# TODO - Audit the codebase and clean-up the stuff we did previously
+# to build our configs by hand. RIP some of my favorite BASH code.
 
 # All work has been completed. Print summary of helpful info.
 echo "SUCCESS: Your system kernel has been upgraded successfully!
