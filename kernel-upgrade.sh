@@ -97,6 +97,13 @@ if [ ! -d /usr/portage/profiles/ ]; then
     exit 1
 fi
 
+# Mount boot if it's not mounted and in fstab
+if [ -z "$(mount | grep ' /boot ')" ]; then
+    if grep -q '/boot' /etc/fstab; then
+        mount /boot || exit 1
+    fi
+fi
+
 # Make sure boot exists, as well as grub
 if [ ! -s ${grubConf} ]; then
     echo "ERROR: Grub install not found." >&2
