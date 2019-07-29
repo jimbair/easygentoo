@@ -32,13 +32,14 @@ PATH='/usr/sbin:/usr/bin:/sbin:/bin'
 # Variables
 boot='/boot/'
 grubConf="${boot}grub/grub.cfg"
+ID=''
 kernOpts=''
 kernelSymlink='/usr/src/linux'
 newConfig="${kernelSymlink}/.config"
 version='2.04'
 
 arch="$(uname -m)"
-if [ -z "${arch}" ]; then
+if [[ -z "${arch}" ]]; then
     echo "ERROR: Unable to determine arch. Exiting." >&2
     exit 1
 fi
@@ -49,7 +50,7 @@ newKernel="${kernelSymlink}/arch/${arch}/boot/bzImage"
 
 # Specify our script name.
 script="$(basename $0 2>/dev/null)"
-if [ $? -ne 0 ]; then
+if [[ $? -ne 0 ]]; then
     script='kernel-upgrade.sh'
 fi
 
@@ -59,20 +60,20 @@ mountFinder(){
     # Find device assigned to provided mountpoint
     mountpoint=$(mount | egrep "^/dev/.* on $1 type " | awk '{print $1}')
     mountpointNum=$(mount | egrep "^/dev/.* on $1 type " | awk '{print $1}' | wc -l)
-    if [ "${mountpointNum}" -gt 1 ]; then
+    if [[ "${mountpointNum}" -gt 1 ]]; then
         echo "ERROR: Found more than one mount point - please debug." >&2
     exit 1
     fi
 
     # Dig in a bit for symlinks if needed.
-    if [ "$(ls -l $mountpoint | wc -w)" -eq 11 ]; then
+    if [[ "$(ls -l $mountpoint | wc -w)" -eq 11 ]]; then
         symcheck=$(ls -l $mountpoint | awk '$10 ~ /\->/ {print $NF}')
-        if [ -z "${symcheck}" ]; then
+        if [[ -z "${symcheck}" ]]; then
             echo "ERROR: Verifying against a symlink failed - please debug." >&2
             exit 1
         fi
 
-        if [ "${symcheck}" != "${mountpoint:5}" ]; then
+        if [[ "${symcheck}" != "${mountpoint:5}" ]]; then
             mountpoint="/dev/${symcheck}"
         fi
     fi
@@ -85,40 +86,41 @@ mountFinder(){
 ##### BEGIN SANITY CHECKS #####
 ###############################
 
+# This script is designed for Gentoo
+[[ -s /etc/os-release ]] && source /etc/os-release
+if [[ "{$ID}" != 'gentoo' ]]; then
+    echo 'ERROR: This script is only designed for Gentoo Linux.' >&2
+    exit 1
+fi
+
 # Must be run as root.
-if [ $UID -ne 0 ]; then
+if [[ $UID -ne 0 ]]; then
     echo "ERROR: $script must be run as root. Exiting." >&2
     exit 1
 fi
 
-# This script is designed for Gentoo and will not work on other systems.
-if [ ! -d /usr/portage/profiles/ ]; then
-    echo 'ERROR: This script is desgined for Gentoo Linux and this is not a Gentoo Linux system.' >&2
-    exit 1
-fi
-
 # Mount boot if it's not mounted and in fstab
-if [ -z "$(mount | grep ' /boot ')" ]; then
+if [[ -z "$(mount | grep ' /boot ')" ]]; then
     if grep -q '/boot' /etc/fstab; then
         mount /boot || exit 1
     fi
 fi
 
 # Make sure boot exists, as well as grub
-if [ ! -s ${grubConf} ]; then
+if [[ ! -s ${grubConf} ]]; then
     echo "ERROR: Grub install not found." >&2
     exit 1
 fi
 
 # Used specifically for Rackspace Cloud pv-grub requirements
 grep -q ' ro console=hvc0' ${grubConf}
-if [ $? -eq 0 ]; then
+if [[ $? -eq 0 ]]; then
     kernOpts='ro console=hvc0'
 fi
 
 # Find our root partition
 root="$(mountFinder /)"
-if [ -z "$root" ]; then
+if [[ -z "$root" ]]; then
     echo "ERROR: Unable to find our root mount point. Exiting." >&2
     exit 1
 fi
@@ -129,7 +131,7 @@ echo "INFO: Found root filesystem partition ${root}"
 # Note $boot is used above, which is why the name differs from $root
 # naming convention. Allows for /boot to be on /, but posts a warning.
 bootDev="$(mountFinder /boot)"
-if [ -z "$bootDev" ]; then
+if [[ -z "$bootDev" ]]; then
     echo -n "INFO: No boot mount point found - assuming /boot resides on /"
     bootDev="${root}"
     sleep 2
@@ -208,12 +210,12 @@ echo "INFO: grub device is $grubRoot"
 
 # Find our current kernel version attached to the $kernelSymlink symlink.
 # Make sure it exists
-if [ -e $kernelSymlink ]; then
+if [[ -e $kernelSymlink ]]; then
     # Make sure it's a symlink
-    if [ -L $kernelSymlink ]; then
+    if [[ -L $kernelSymlink ]]; then
         fullKernelPath=$(readlink -e $kernelSymlink 2>&1)
         # Make sure readlink exits cleanly
-        if [ $? -ne 0 ]; then
+        if [[ $? -ne 0 ]]; then
             echo 'ERROR: Unable to find the full path of our Linux kernel. Exiting.' >&2
             exit 1
         else
@@ -233,7 +235,7 @@ fi
 # Now, compare our symlink against our live kernel version. Just a safety check
 systemKernelVersion="$(echo linux-$(uname -r))"
 sourceKernelVersion="$(echo $fullKernelPath | cut -d / -f 4-4)"
-if [ "$systemKernelVersion" != "$sourceKernelVersion" ]; then
+if [[ "$systemKernelVersion" != "$sourceKernelVersion" ]]; then
     echo "ERROR: The kernel version for $kernelSymlink does not match the current system kernel." >&2
     echo "System Kernel: $systemKernelVersion" >&2
     echo "Source Kernel: $sourceKernelVersion" >&2
@@ -250,7 +252,7 @@ cd /usr/src/
 
 # Find the latest kernel - Ensure it's not the same as what's configured/running.
 latestKernelVersion="$(ls -c | grep -v 'linux$' | grep -v 'rpm' | head -1)"
-if [ -z "$latestKernelVersion" ]; then
+if [[ -z "$latestKernelVersion" ]]; then
     echo "ERROR: Unable to find our latest kernel version! Exiting." >&2
     exit 1
 fi
@@ -258,13 +260,13 @@ fi
 echo "SUCCESS: Found latest kernel version: $latestKernelVersion"
 
 # Make sure our running kernel is there
-if [ ! -s ${sourceKernelVersion}/.config ]; then
+if [[ ! -s ${sourceKernelVersion}/.config ]]; then
      echo "ERROR: Unable to find our current kernel config! Exiting." >&2
      exit 1
 fi
 
 # Make sure the latest version is not the same as what we're currently running.
-if [ "$sourceKernelVersion" == "$latestKernelVersion" ]; then
+if [[ "$sourceKernelVersion" == "$latestKernelVersion" ]]; then
     echo "INFO: There are no new kernel versions to install. Exiting."
     exit 0
 fi
@@ -273,7 +275,7 @@ echo "SUCCESS: Latest kernel version $latestKernelVersion newer than System kern
 
 
 # Check for .config in our new kernel directory
-if [ -s ${latestKernelVersion}/.config ]; then
+if [[ -s ${latestKernelVersion}/.config ]]; then
     echo "INFO: Config file for $latestKernelVersion found!"
     echo "We are going to overwrite this file during the upgrade."
     echo -n "This is expected. Exit now if you wish or press enter to proceed."
@@ -287,13 +289,13 @@ fi
 bootCheck="$(echo $latestKernelVersion | cut -d - -f 2-)"
 
 # Start our checks for stuff in $boot if it does not reside on /
-if [ "${root}" != "${bootDev}" ]; then
+if [[ "${root}" != "${bootDev}" ]]; then
     # Make sure $boot is mounted. If not, mount it.
-    if [ -z "$(mount | grep /boot)" ]; then
+    if [[ -z "$(mount | grep /boot)" ]]; then
         wasBootMounted=no
         echo "INFO: $boot not mounted, mounting."
         mount $boot
-        if [ $? -eq 0 ]; then
+        if [[ $? -eq 0 ]]; then
             echo "SUCCESS: $boot mounted successfully."
         else
             echo "ERROR: Unable to mount $boot! Exiting." >&2
@@ -304,7 +306,7 @@ if [ "${root}" != "${bootDev}" ]; then
         echo "INFO: $boot already mounted."
     fi
     # Now that $boot is mounted, check for $grubConf
-    if [ -s $grubConf ]; then
+    if [[ -s $grubConf ]]; then
         grubConfExist=yes
         echo "INFO: $grubConf found."
     else
@@ -323,7 +325,7 @@ fi
 
 # Make sure our latest kernel is not in $boot
 cd $boot
-if [ -n "$(ls | grep $bootCheck)" ]; then
+if [[ -n "$(ls | grep $bootCheck)" ]]; then
     echo "ERROR: The kernel you are trying to upgrade to is already installed! Exiting." >&2
     exit 1
 fi
@@ -362,7 +364,7 @@ cd $latestKernelVersion
 
 # Migrate the config to our new kernel and accept any new defaults
 make olddefconfig
-if [ $? -ne 0 ]; then
+if [[ $? -ne 0 ]]; then
     echo "ERROR: make oldconfig errored out unexpectedly. Exiting." >&2
     exit 1
 fi
@@ -373,7 +375,7 @@ echo "SUCCESS: Upgraded our config file successfully!"
 # are needed.
 procNum=$((`grep -c vendor_id /proc/cpuinfo` + 1))
 make -j${procNum}
-if [ $? -ne 0 ]; then
+if [[ $? -ne 0 ]]; then
     echo "ERROR: Building our kernel failed. Exiting." >&2
     exit 1
 fi
@@ -381,7 +383,7 @@ fi
 echo "SUCCESS: Kernel built successfully!"
 
 make modules_install
-if [ $? -ne 0 ]; then
+if [[ $? -ne 0 ]]; then
     echo "ERROR: Building our kernel modules failed. Exiting." >&2
     exit 1
 fi
@@ -395,7 +397,7 @@ cd /usr/src/
 # This is split into rm/ln since ln -sf does not work on my Gentoo system.
 echo -n "Removing old symlink..."
 rm -f linux
-if [ $? -eq 0 ]; then
+if [[ $? -eq 0 ]]; then
     echo 'done.'
 else
     echo
@@ -405,7 +407,7 @@ fi
 
 echo -n "Creating new symlink..."
 ln -s $latestKernelVersion linux
-if [ $? -eq 0 ]; then
+if [[ $? -eq 0 ]]; then
     echo 'done.'
 else
     echo
@@ -421,7 +423,7 @@ latestKernelVersion="$(echo $latestKernelVersion | cut -d - -f 2-)"
 # Copy over our files!
 echo -n "INFO: Installing new kernel into ${boot}..."
 cp $newKernel kernel-${latestKernelVersion}
-if [ $? -eq 0 ]; then
+if [[ $? -eq 0 ]]; then
     echo 'done.'
 else
     echo
@@ -430,7 +432,7 @@ else
 fi
 cp $newConfig config-${latestKernelVersion}
 echo -n "INFO: Installing new config into ${boot}..."
-if [ $? -eq 0 ]; then
+if [[ $? -eq 0 ]]; then
     echo 'done.'
 else
     echo
@@ -439,10 +441,10 @@ else
 fi
 
 # Backup our config file if present
-if [ "$grubConfExist" == "yes" ]; then
+if [[ "$grubConfExist" == "yes" ]]; then
     echo -n "INFO: Backing up ${grubConf}..."
     mv $grubConf ${grubConf}.backup
-    if [ $? -eq 0 ]; then
+    if [[ $? -eq 0 ]]; then
         echo 'done.'
     else
         echo
@@ -472,7 +474,7 @@ du -h $(ls -c ${boot}kernel-*)
 cd /
 
 # If $boot was not originally mounted, unmount it.
-if [ "$wasBootMounted" == "no" ]; then
+if [[ "$wasBootMounted" == "no" ]]; then
     echo -n "$boot not originally mounted. Unmounting..."
     umount $boot
     echo 'done.'
