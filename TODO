@@ -1,4 +1,6 @@
-1. Create kernelprune.py
+1. Leverage eslect for kernel updates and allow manual builds as well as genkernel since I'm now old and lazy.
+
+2. Create kernelprune.py (still valid? investigate depclean vs prune)
     -run emerge --prune --pretend and
         -find what's being removed
         -what's being used/protected
@@ -19,4 +21,4 @@
     -Option to save previous kernel (maybe by default?)
 
 
-2. Make etc-update-diff.sh dynamic so it can work with 0001 or even 0009 files instead of only 0000. If the same config file has 2 updates in the queue, the # rises sequentially.
+3. Make etc-update-diff.sh dynamic so it can work with 0001 or even 0009 files instead of only 0000. If the same config file has 2 updates in the queue, the # rises sequentially.
