@@ -30,7 +30,8 @@ fi
 
 # Let's hit it with the default parts
 # TODO: Fix rootfs being a static size; parted pukes if given -1 in script mode
-# I have it setup to fit inside a 5GiB disk for all parts (~4GB rootfs)
+# I have it setup to fit inside a 10GiB disk for all parts (~9GB rootfs)
+# If this is too small (5GB) emerge-webrsync pukes
 parted --script ${DISK} \
 mklabel gpt \
 mkpart primary ext4 1MiB 3MiB \
@@ -39,7 +40,7 @@ mkpart primary ext4 3MiB 131MiB \
 name 2 boot \
 mkpart primary ext4 131MiB 643MiB \
 name 3 swap \
-mkpart primary ext4 643MiB 4763MiB \
+mkpart primary ext4 643MiB 9763MiB \
 name 4 rootfs \
 set 2 boot on
 ec=$?
@@ -59,7 +60,7 @@ mkfs.ext4 ${DISK}4
 mount ${DISK}4 /mnt/gentoo
 cd /mnt/gentoo
 # TODO: Make this dynamic and validated
-wget http://distfiles.gentoo.org/releases/amd64/autobuilds/20190811T214502Z/stage3-amd64-20190811T214502Z.tar.xz
+wget http://distfiles.gentoo.org/releases/amd64/autobuilds/20190814T214502Z/stage3-amd64-20190814T214502Z.tar.xz
 tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
 rm -f stage3-*.tar.xz
 
@@ -74,14 +75,19 @@ mount --rbind /dev /mnt/gentoo/dev
 mount --make-rslave /mnt/gentoo/dev
 
 # chroot all the things!
+# Note - trying || exit 1 does nothing in here sadly
 # TODO:
 # switch over to git out of the box
 # Diddle make.conf a bit
 # Make net interface (eth0) dynamic
+# Find way to abort if command fails
+# Handle config unmasking magically
 cat << EOF | chroot /mnt/gentoo
 mount ${DISK}2 /boot
-emerge-webrsync || exit 1
+emerge-webrsync
 emerge --update --deep --newuse @world
+emerge --autounmask-write sys-kernel/gentoo-sources sys-kernel/genkernel
+etc-update --automode -5
 emerge sys-kernel/gentoo-sources sys-kernel/genkernel
 genkernel all
 echo "${DISK}2   /boot        vfat    noauto,noatime       0 2" > /etc/fstab
