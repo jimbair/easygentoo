@@ -9,6 +9,7 @@
 # No LVM
 # EFI-based install
 # Default partitions from handbook
+# genkernel with normal sources
 
 # No root, no love
 [[ "${UID}" != '0' ]] && exit 1
@@ -59,7 +60,9 @@ mount ${DISK}4 /mnt/gentoo
 cd /mnt/gentoo
 # TODO: Make this dynamic and validated
 wget http://distfiles.gentoo.org/releases/amd64/autobuilds/20190811T214502Z/stage3-amd64-20190811T214502Z.tar.xz
-tar xpvf stage3-*.tar.bz2 --xattrs-include='*.*' --numeric-owner
+tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
+rm -f stage3-*.tar.xz
+
 #
 # Here is where you can adjust default configs before we start building things
 #
@@ -69,3 +72,40 @@ mount --rbind /sys /mnt/gentoo/sys
 mount --make-rslave /mnt/gentoo/sys
 mount --rbind /dev /mnt/gentoo/dev
 mount --make-rslave /mnt/gentoo/dev
+
+# chroot all the things!
+# TODO:
+# switch over to git out of the box
+# Diddle make.conf a bit
+# Make net interface (eth0) dynamic
+cat << EOF | chroot /mnt/gentoo
+mount ${DISK}2 /boot
+emerge-webrsync || exit 1
+emerge --update --deep --newuse @world
+emerge sys-kernel/gentoo-sources sys-kernel/genkernel
+genkernel all
+echo "${DISK}2   /boot        vfat    noauto,noatime       0 2" > /etc/fstab
+echo "${DISK}3   none         swap    sw                   0 0" >> /etc/fstab
+echo "${DISK}4   /            ext4    noatime              0 1" >> /etc/fstab
+emerge --noreplace net-misc/netifrc
+echo 'hostname="gentoo"' > /etc/conf.d/hostname
+echo 'config_eth0="dhcp"' > /etc/conf.d/net
+ln -s /etc/init.d/net.lo /etc/init.d/net.eth0
+rc-update add net.eth0 default
+echo ChangeMe123 | passwd --stdin
+emerge app-admin/sysklogd sys-process/cronie
+rc-update add sysklogd default
+rc-update add cronie default
+emerge sys-fs/e2fsprogs sys-fs/dosfstools
+emerge net-misc/dhcpcd
+echo 'GRUB_PLATFORMS="efi-64"' >> /etc/portage/make.conf
+emerge sys-boot/grub:2
+grub-install --target=x86_64-efi --efi-directory=/boot
+grub-mkconfig -o /boot/grub/grub.cfg
+EOF
+
+# Clean up and run away
+cd
+umount -l /mnt/gentoo/dev{/shm,/pts,}
+umount -R /mnt/gentoo
+#reboot
