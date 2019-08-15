@@ -14,6 +14,9 @@
 # No root, no love
 [[ "${UID}" != '0' ]] && exit 1
 
+# No EFI, no love
+[[ ! -d '/sys/firmware/efi/' ]] && exit 1
+
 # QEMU image for testing
 DISK='/dev/vda'
 if [[ ! -b "${DISK}" ]]; then
