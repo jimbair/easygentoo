@@ -101,7 +101,7 @@ echo 'hostname="gentoo"' > /etc/conf.d/hostname
 echo 'config_eth0="dhcp"' > /etc/conf.d/net
 ln -s /etc/init.d/net.lo /etc/init.d/net.eth0
 rc-update add net.eth0 default
-echo ChangeMe123 | passwd --stdin
+echo -e 'ChangeMe123\nChangeMe123' | passwd root
 emerge app-admin/sysklogd sys-process/cronie
 rc-update add sysklogd default
 rc-update add cronie default
