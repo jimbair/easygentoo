@@ -62,8 +62,18 @@ mkfs.ext4 ${DISK}4
 # Mount the goods and fetch the gentooz
 mount ${DISK}4 /mnt/gentoo
 cd /mnt/gentoo
-# TODO: Make this dynamic and validated
-wget http://distfiles.gentoo.org/releases/amd64/autobuilds/20190814T214502Z/stage3-amd64-20190814T214502Z.tar.xz
+
+# This should be better, but we're still in the hacking phase
+# TODO: Validate the stage3 tarball
+baseURL='http://distfiles.gentoo.org/releases/amd64/autobuilds'
+latestURL="${baseURL}/latest-stage3-amd64.txt"
+latest_stage3=$(curl ${latestURL} | tail -n 1 | cut -d ' ' -f 1)
+wget "${baseURL}/${latest_stage3}"
+if [[ $? -ne 0 ]]; then
+    echo "ERROR: Fetching the latest stage3 failed." >&2
+    exit 1
+fi
+
 tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
 rm -f stage3-*.tar.xz
 
