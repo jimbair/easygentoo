@@ -25,7 +25,7 @@ if [[ ! -b "${DISK}" ]]; then
 fi
 
 # This nested echo is a hack
-PARTS=$(ls $(echo $DISK)* | grep -v "^${DISK}$" | wc -l)
+PARTS=$(ls $(echo $DISK)* | grep -c -v "^${DISK}$")
 if [[ "${PARTS}" -ne 0 ]]; then
     echo "ERROR: ${PARTS} partitions found on target disk ${DISK}" >&2
     exit 1
