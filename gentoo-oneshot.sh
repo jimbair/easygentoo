@@ -11,11 +11,8 @@
 # Default partitions from handbook
 # genkernel with normal sources
 
-# No root, no love
-[[ "${UID}" != '0' ]] && exit 1
-
-# No EFI, no love
-[[ ! -d '/sys/firmware/efi/' ]] && exit 1
+# No root or EFI, no love
+[[ "${UID}" != '0' ]] || [[ ! -d '/sys/firmware/efi/' ]] && exit 1
 
 # QEMU image for testing
 DISK='/dev/vda'
