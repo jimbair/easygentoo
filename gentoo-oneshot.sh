@@ -11,11 +11,15 @@
 # Default partitions from handbook
 # genkernel with normal sources
 
+# User defined parameters
+DISK='/dev/vda'
+ROOTPW='ChangeMe123'
+
+# Validations
 # No root or EFI, no love
 [[ "${UID}" != '0' ]] || [[ ! -d '/sys/firmware/efi/' ]] && exit 1
 
 # QEMU image for testing
-DISK='/dev/vda'
 if [[ ! -b "${DISK}" ]]; then
     echo "ERROR: Our target disk ${DISK} is missing." >&2
     exit 1
@@ -25,6 +29,19 @@ fi
 PARTS=$(ls $(echo $DISK)* | grep -c -v "^${DISK}$")
 if [[ "${PARTS}" -ne 0 ]]; then
     echo "ERROR: ${PARTS} partitions found on target disk ${DISK}" >&2
+    exit 1
+fi
+
+# Make sure the NIC exists
+NETDEV=$(route -n | grep '^0.0.0.0' | awk '{print $NF}')
+if [[ -z "${NETDEV}" ]]; then
+    echo "ERROR: Unable to discover our network device." >&2
+    exit 1
+fi
+
+ifconfig ${NETDEV} &> /dev/null
+if [[ $? -ne 0 ]]; then
+    echo "ERROR: Network device $NETDEV is missing." >&2
     exit 1
 fi
 
@@ -43,8 +60,7 @@ name 3 swap \
 mkpart primary ext4 643MiB 9763MiB \
 name 4 rootfs \
 set 2 boot on
-ec=$?
-if [[ "${ec}" -ne 0 ]]; then
+if [[ $? -ne 0 ]]; then
     echo "ERROR: parted ran into some sort of issue." >&2
     exit 1
 fi
@@ -85,12 +101,10 @@ mount --rbind /dev /mnt/gentoo/dev
 mount --make-rslave /mnt/gentoo/dev
 
 # chroot all the things!
-# Note - trying || exit 1 does nothing in here sadly
 # TODO:
 # switch over to git out of the box
 # Diddle make.conf a bit
-# Make net interface (eth0) dynamic
-# Find way to abort if command fails
+# Find way to abort if any chroot'd command fails
 # Handle config unmasking magically
 cat << EOF | chroot /mnt/gentoo
 mount ${DISK}2 /boot
@@ -105,10 +119,10 @@ echo "${DISK}3   none         swap    sw                   0 0" >> /etc/fstab
 echo "${DISK}4   /            ext4    noatime              0 1" >> /etc/fstab
 emerge --noreplace net-misc/netifrc
 echo 'hostname="gentoo"' > /etc/conf.d/hostname
-echo 'config_eth0="dhcp"' > /etc/conf.d/net
-ln -s /etc/init.d/net.lo /etc/init.d/net.eth0
-rc-update add net.eth0 default
-echo -e 'ChangeMe123\nChangeMe123' | passwd root
+echo "config_${NETDEV}='dhcp'" > /etc/conf.d/net
+ln -s /etc/init.d/net.lo /etc/init.d/net.${NETDEV}
+rc-update add net.${NETDEV} default
+echo -e "${ROOTPW}\n${ROOTPW}" | passwd root
 emerge app-admin/sysklogd sys-process/cronie
 rc-update add sysklogd default
 rc-update add cronie default
