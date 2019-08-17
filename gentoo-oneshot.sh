@@ -14,6 +14,11 @@
 # User defined parameters
 DISK='/dev/vda'
 ROOTPW='ChangeMe123'
+# Sizes in MiB and direct from the handbook
+# Root filesystem takes up the reaminder
+GRUBSIZE='2'
+BOOTSIZE='128'
+SWAPSIZE='512'
 
 # Validations
 # No root or EFI, no love
@@ -45,23 +50,37 @@ if [[ $? -ne 0 ]]; then
     exit 1
 fi
 
-# Let's hit it with the default parts
-# TODO: Fix rootfs being a static size; parted pukes if given -1 in script mode
-# I have it setup to fit inside a 10GiB disk for all parts (~9GB rootfs)
-# If this is too small (5GB) emerge-webrsync pukes
-parted --script ${DISK} \
+# There HAS to be a way for parted to support end-of-disk on the final partition
+# with the -s flag, but I gave up and started this tragedy. If you use the full
+# disk size, parted complains, so we lose <1MiB as a result. It's stupid, but so 
+# are computers. I'm sure a flag somewhere I'm overlooking will result in this 
+# whole codeblock being purged in the future, as it should be. But it works.
+DISKSIZE=$(parted -s ${DISK} unit MiB print 2>/dev/null | grep '^Disk /' | cut -d ' ' -f 3 | cut -d M -f 1)
+if [[ -z "${DISKSIZE}" ]]; then
+    echo "ERROR: Cannot find the size of the disk ${DISK}" >&2
+    exit 1
+fi
+
+# Time for some maths
+GRUBPART=$((1+${GRUBSIZE}))
+BOOTPART=$((${GRUBPART}+${BOOTSIZE}))
+SWAPPART=$((${BOOTPART}+${SWAPSIZE}))
+ROOTPART=$((${DISKSIZE}-1))
+
+# Let's hit it with the partitions
+parted -s -a optimal ${DISK} \
 mklabel gpt \
-mkpart primary ext4 1MiB 3MiB \
+mkpart primary ext4 1MiB ${GRUBPART}MiB \
 name 1 grub \
-mkpart primary ext4 3MiB 131MiB \
+mkpart primary fat32 ${GRUBPART}MiB ${BOOTPART}MiB \
 name 2 boot \
-mkpart primary ext4 131MiB 643MiB \
+mkpart primary linux-swap ${BOOTPART}MiB ${SWAPPART}MiB \
 name 3 swap \
-mkpart primary ext4 643MiB 9763MiB \
+mkpart primary ext4 ${SWAPPART}MiB ${ROOTPART}MiB \
 name 4 rootfs \
 set 2 boot on
 if [[ $? -ne 0 ]]; then
-    echo "ERROR: parted ran into some sort of issue." >&2
+    echo "ERROR: parted failed to create our partitions" >&2
     exit 1
 fi
 
