@@ -108,16 +108,16 @@ mount --make-rslave /mnt/gentoo/dev
 # Handle config unmasking magically
 cat << EOF | chroot /mnt/gentoo
 echo -e "${ROOTPW}\n${ROOTPW}" | passwd root
-mount ${DISK}2 /boot
+echo "${DISK}2   /boot        vfat    noauto,noatime       0 2" > /etc/fstab
+echo "${DISK}3   none         swap    sw                   0 0" >> /etc/fstab
+echo "${DISK}4   /            ext4    noatime              0 1" >> /etc/fstab
+mount /boot
 emerge-webrsync
 emerge --update --deep --newuse @world
 emerge --autounmask-write sys-kernel/gentoo-sources sys-kernel/genkernel
 etc-update --automode -5
 emerge sys-kernel/gentoo-sources sys-kernel/genkernel
 genkernel all
-echo "${DISK}2   /boot        vfat    noauto,noatime       0 2" > /etc/fstab
-echo "${DISK}3   none         swap    sw                   0 0" >> /etc/fstab
-echo "${DISK}4   /            ext4    noatime              0 1" >> /etc/fstab
 emerge --noreplace net-misc/netifrc
 echo 'hostname="gentoo"' > /etc/conf.d/hostname
 echo "config_${NETDEV}='dhcp'" > /etc/conf.d/net
