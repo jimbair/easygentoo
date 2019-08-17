@@ -15,7 +15,7 @@
 DISK='/dev/vda'
 ROOTPW='ChangeMe123'
 # Sizes in MiB and direct from the handbook
-# Root filesystem takes up the reaminder
+# Root filesystem takes up the remainder
 GRUBSIZE='2'
 BOOTSIZE='128'
 SWAPSIZE='512'
