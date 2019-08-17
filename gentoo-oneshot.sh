@@ -110,9 +110,7 @@ fi
 tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
 rm -f stage3-*.tar.xz
 
-#
-# Here is where you can adjust default configs before we start building things
-#
+# Prep the chroot
 cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
 mount --types proc /proc /mnt/gentoo/proc
 mount --rbind /sys /mnt/gentoo/sys
