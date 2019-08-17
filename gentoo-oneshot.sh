@@ -1,10 +1,8 @@
 #!/bin/bash
-# Simple script for a one-shot install of Gentoo from scratch
-# Used to make a fast, bare-bones install at a targeted disk
-# Ideally, I'd rather get quickstart working again (or make a new one).
-
-# Liberties taken / assumptions made:
+# A simple BASH script for a one-shot install of Gentoo at a targeted disk
+# Ideally, I'd rather get quickstart/kicktoo working (or make something new)
 #
+# Liberties taken / assumptions made:
 # No LVM
 # DHCP networking
 # EFI-based install
