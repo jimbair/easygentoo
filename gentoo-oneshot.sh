@@ -5,15 +5,16 @@
 
 # Liberties taken / assumptions made:
 #
-# DHCP networking
 # No LVM
+# DHCP networking
 # EFI-based install
-# Default partitions from handbook
-# genkernel with normal sources
+# genkernel used for kernel
+# Root partition uses remainder of disk
 
 # User defined parameters
 DISK='/dev/vda'
 ROOTPW='ChangeMe123'
+
 # Sizes in MiB and direct from the handbook
 # Root filesystem takes up the remainder
 GRUBSIZE='2'
