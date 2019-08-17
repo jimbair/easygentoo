@@ -107,6 +107,7 @@ mount --make-rslave /mnt/gentoo/dev
 # Find way to abort if any chroot'd command fails
 # Handle config unmasking magically
 cat << EOF | chroot /mnt/gentoo
+echo -e "${ROOTPW}\n${ROOTPW}" | passwd root
 mount ${DISK}2 /boot
 emerge-webrsync
 emerge --update --deep --newuse @world
@@ -122,14 +123,10 @@ echo 'hostname="gentoo"' > /etc/conf.d/hostname
 echo "config_${NETDEV}='dhcp'" > /etc/conf.d/net
 ln -s /etc/init.d/net.lo /etc/init.d/net.${NETDEV}
 rc-update add net.${NETDEV} default
-echo -e "${ROOTPW}\n${ROOTPW}" | passwd root
-emerge app-admin/sysklogd sys-process/cronie
+echo 'GRUB_PLATFORMS="efi-64"' >> /etc/portage/make.conf
+emerge app-admin/sysklogd sys-process/cronie sys-fs/e2fsprogs sys-fs/dosfstools net-misc/dhcpcd sys-boot/grub:2
 rc-update add sysklogd default
 rc-update add cronie default
-emerge sys-fs/e2fsprogs sys-fs/dosfstools
-emerge net-misc/dhcpcd
-echo 'GRUB_PLATFORMS="efi-64"' >> /etc/portage/make.conf
-emerge sys-boot/grub:2
 grub-install --target=x86_64-efi --efi-directory=/boot
 grub-mkconfig -o /boot/grub/grub.cfg
 EOF
