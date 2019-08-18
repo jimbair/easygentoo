@@ -23,7 +23,7 @@ SWAPSIZE='512'
 # No root or EFI, no love
 [[ "${UID}" != '0' ]] || [[ ! -d '/sys/firmware/efi/' ]] && exit 1
 
-# QEMU image for testing
+# Make sure the disk specified exists
 if [[ ! -b "${DISK}" ]]; then
     echo "ERROR: Our target disk ${DISK} is missing." >&2
     exit 1
