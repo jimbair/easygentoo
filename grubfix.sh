@@ -9,7 +9,6 @@ mount --rbind /sys /mnt/gentoo/sys
 mount --make-rslave /mnt/gentoo/sys
 mount --rbind /dev /mnt/gentoo/dev
 mount --make-rslave /mnt/gentoo/dev
-chroot /mnt/gentoo mount /boot
 chroot /mnt/gentoo grub-install --target=x86_64-efi --efi-directory=/boot 
 umount -l /mnt/gentoo/dev{/shm,/pts,}
 umount -R /mnt/gentoo
