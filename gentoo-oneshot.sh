@@ -45,7 +45,7 @@ fi
 
 ifconfig ${NETDEV} &> /dev/null
 if [[ $? -ne 0 ]]; then
-    echo "ERROR: Network device $NETDEV is missing." >&2
+    echo "ERROR: Network device ${NETDEV} is missing." >&2
     exit 1
 fi
 
