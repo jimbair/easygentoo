@@ -10,7 +10,7 @@
 # Root partition uses remainder of disk
 
 # User defined parameters
-DISK='/dev/vda'
+DISK='/dev/sda'
 ROOTPW='ChangeMe123'
 
 # Sizes in MiB and direct from the handbook
@@ -20,8 +20,20 @@ BOOTSIZE='128'
 SWAPSIZE='512'
 
 # Validations
-# No root or EFI, no love
-[[ "${UID}" != '0' ]] || [[ ! -d '/sys/firmware/efi/' ]] && exit 1
+# Run only as root
+[[ "${UID}" != '0' ]] && exit 1
+
+# Must be on EFI
+if [[ ! -d '/sys/firmware/efi/' ]]; then
+    echo "ERROR: This system is not in EFI Mode. Exiting." >&2
+    exit 1
+fi
+
+# Must be run on 64-bit
+if [[ $(arch) != 'x86_64' ]]; then
+    echo "ERROR: This system is not x86_64. Exiting." >&2
+    exit 1
+fi
 
 # Make sure the disk specified exists
 if [[ ! -b "${DISK}" ]]; then
