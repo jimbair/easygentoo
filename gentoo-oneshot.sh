@@ -61,6 +61,12 @@ if [[ $? -ne 0 ]]; then
     exit 1
 fi
 
+# Turn on SSH in case we need to poke around
+if [ -x '/etc/init.d/sshd' ]; then
+    /etc/init.d/sshd start
+    echo -e "${ROOTPW}\n${ROOTPW}" | passwd root
+fi
+
 # There HAS to be a way for parted to support end-of-disk on the final partition
 # with the -s flag, but I gave up and started this tragedy. If you use the full
 # disk size, parted complains, so we lose <1MiB as a result. It's stupid, but so 
