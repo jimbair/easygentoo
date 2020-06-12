@@ -3,15 +3,25 @@
 # Ideally, I'd rather get quickstart/kicktoo working (or make something new)
 #
 # Liberties taken / assumptions made:
+# Installs to either /dev/vda or /dev/sda
 # No LVM
 # DHCP networking
 # EFI-based install
 # genkernel used for kernel
 # Root partition uses remainder of disk
 
-# User defined parameters
-DISK='/dev/sda'
+# root password
 ROOTPW='ChangeMe123'
+
+# Find our disk
+if [[ -b '/dev/vda' ]]; then
+    DISK='/dev/vda'
+elif [[ -b '/dev/sda' ]]; then
+    DISK='/dev/sda'
+else
+    echo "ERROR: Unable to locate usable install disk" >&2
+    exit 1
+fi
 
 # Sizes in MiB and direct from the handbook
 # Root filesystem takes up the remainder
