@@ -45,12 +45,6 @@ if [[ $(arch) != 'x86_64' ]]; then
     exit 1
 fi
 
-# Make sure the disk specified exists
-if [[ ! -b "${DISK}" ]]; then
-    echo "ERROR: Our target disk ${DISK} is missing." >&2
-    exit 1
-fi
-
 # This nested echo is a hack
 PARTS=$(ls $(echo $DISK)* | grep -c -v "^${DISK}$")
 if [[ "${PARTS}" -ne 0 ]]; then
