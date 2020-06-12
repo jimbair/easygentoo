@@ -31,7 +31,7 @@ SWAPSIZE='512'
 
 # Validations
 # Run only as root
-[[ "${UID}" != '0' ]] && exit 1
+[[ "${UID}" == '0' ]] || exit 1
 
 # Must be on EFI
 if [[ ! -d '/sys/firmware/efi/' ]]; then
