@@ -155,7 +155,7 @@ emerge --update --deep --newuse @world
 emerge --autounmask-write sys-kernel/gentoo-sources sys-kernel/genkernel
 etc-update --automode -5
 emerge sys-kernel/gentoo-sources sys-kernel/genkernel
-genkernel all --makeopts=-$(grep -c processor /proc/cpuinfo)
+genkernel all --makeopts=-j$(grep -c processor /proc/cpuinfo)
 emerge --noreplace net-misc/netifrc
 echo 'hostname="gentoo"' > /etc/conf.d/hostname
 echo "config_${NETDEV}='dhcp'" > /etc/conf.d/net
