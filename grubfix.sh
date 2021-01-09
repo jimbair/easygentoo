@@ -1,8 +1,8 @@
 #!/bin/bash
 # Because Gigabyte nukes my grub install with each firmware update on my
 # X570 I AORUS PRO WIFI board, and my 3900X seems to need many of those.
-mount /dev/nvme0n1p7 /mnt/gentoo
-mount /dev/nvme0n1p6 /mnt/gentoo/boot
+mount /dev/nvme1n1p7 /mnt/gentoo
+mount /dev/nvme1n1p6 /mnt/gentoo/boot
 cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
 mount --types proc /proc /mnt/gentoo/proc
 mount --rbind /sys /mnt/gentoo/sys
