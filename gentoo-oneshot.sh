@@ -119,7 +119,7 @@ cd /mnt/gentoo
 # This should be better, but we're still in the hacking phase
 # TODO: Validate the stage3 tarball
 baseURL='http://distfiles.gentoo.org/releases/amd64/autobuilds'
-latestURL="${baseURL}/latest-stage3-amd64.txt"
+latestURL="${baseURL}/latest-stage3-amd64-openrc.txt"
 latest_stage3=$(curl -s ${latestURL} | tail -n 1 | cut -d ' ' -f 1)
 wget "${baseURL}/${latest_stage3}"
 if [[ $? -ne 0 ]]; then
