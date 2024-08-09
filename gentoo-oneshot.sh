@@ -120,7 +120,12 @@ cd /mnt/gentoo
 # TODO: Validate the stage3 tarball
 baseURL='http://distfiles.gentoo.org/releases/amd64/autobuilds'
 latestURL="${baseURL}/latest-stage3-amd64-openrc.txt"
-latest_stage3=$(curl -s ${latestURL} | tail -n 1 | cut -d ' ' -f 1)
+latest_stage3=$(curl -s ${latestURL} | grep -B 1 'BEGIN PGP SIGNATURE' | head -n 1 | cut -d ' ' -f 1)
+if [[ -z "${latest_stage3}" ]]; then
+    echo "ERROR: Unable to find the latest stage3 tarball." >&2
+    exit 1
+fi
+
 wget "${baseURL}/${latest_stage3}"
 if [[ $? -ne 0 ]]; then
     echo "ERROR: Fetching the latest stage3 failed." >&2
@@ -128,6 +133,11 @@ if [[ $? -ne 0 ]]; then
 fi
 
 tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
+if [[ $? -ne 0 ]]; then
+    echo "ERROR: Unpacking the latest stage3 failed." >&2
+    exit 1
+fi
+
 rm -f stage3-*.tar.xz
 
 # Prep the chroot
