@@ -1,24 +1,3 @@
 1. Leverage eslect for kernel updates and allow manual builds as well as genkernel since I'm now old and lazy.
 
-2. Create kernelprune.py (still valid? investigate depclean vs prune)
-    -run emerge --prune --pretend and
-        -find what's being removed
-        -what's being used/protected
-    -run eselect kernel list and see what's being used
-    -run uname -r and see what's being used
-    -verify we're running the same version as both
-     protected by portage and chosen by eselect
-
-    -When confirmed, do:
-        -emerge --prune
-        -Remove the following items from kernels
-         listed in the --prune --pretend:
-            -System.map, initrd, and vmlinuz from /boot/
-            -Source folders from /usr/src/
-            -Modules from /lib/modules/
-            -Entries from /menu/grub/menu.list
-
-    -Option to save previous kernel (maybe by default?)
-
-
-3. Make etc-update-diff.sh dynamic so it can work with 0001 or even 0009 files instead of only 0000. If the same config file has 2 updates in the queue, the # rises sequentially.
+2. Make etc-update-diff.sh dynamic so it can work with 0001 or even 0009 files instead of only 0000. If the same config file has 2 updates in the queue, the # rises sequentially.
