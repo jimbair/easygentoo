@@ -34,6 +34,7 @@ SWAPSIZE='512'
 [[ "${UID}" == '0' ]] || exit 1
 
 # Must be on EFI
+# In virt-manager: /usr/share/edk2/ovmf/OVMF_CODE.fd
 if [[ ! -d '/sys/firmware/efi/' ]]; then
     echo "ERROR: This system is not in EFI Mode. Exiting." >&2
     exit 1
