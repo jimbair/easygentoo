@@ -13,6 +13,12 @@
 # root password
 ROOTPW='ChangeMe123'
 
+# Debug is helpful when stuff breaks
+# Pass any single argument for debug mode
+debug() {
+  [[ -n "$1" ]] && "read -p "DEBUG: Press enter to continue."
+}
+
 # Find our disk
 if [[ -b '/dev/vda' ]]; then
     DISK='/dev/vda'
@@ -22,6 +28,9 @@ else
     echo "ERROR: Unable to locate usable install disk" >&2
     exit 1
 fi
+
+echo "Disk found: ${DISK}"
+debug
 
 # Sizes in MiB and direct from the handbook
 # Root filesystem takes up the remainder
@@ -91,6 +100,8 @@ if [ -x '/etc/init.d/sshd' ]; then
     echo -e "${ROOTPW}\n${ROOTPW}" | passwd root
 fi
 
+debug
+
 # There HAS to be a way for parted to support end-of-disk on the final partition
 # with the -s flag, but I gave up and started this tragedy. If you use the full
 # disk size, parted complains, so we lose <1MiB as a result. It's stupid, but so 
@@ -125,12 +136,16 @@ if [[ $? -ne 0 ]]; then
     exit 1
 fi
 
+debug
+
 # Format the things
 # TODO: Bring in our run() style function
 mkfs.fat -F 32 ${DISK}2
 mkswap ${DISK}3
 swapon ${DISK}3 # needed?
 mkfs.ext4 ${DISK}4
+
+debug
 
 # Mount the goods and fetch the gentooz
 mount ${DISK}4 /mnt/gentoo
@@ -167,7 +182,6 @@ mount --rbind /sys /mnt/gentoo/sys
 mount --make-rslave /mnt/gentoo/sys
 mount --rbind /dev /mnt/gentoo/dev
 mount --make-rslave /mnt/gentoo/dev
-
 
 # chroot all the things!
 # TODO:
