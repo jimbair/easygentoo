@@ -40,10 +40,29 @@ if [[ ! -d '/sys/firmware/efi/' ]]; then
     exit 1
 fi
 
-# Must be run on 64-bit
-if [[ $(arch) != 'x86_64' ]]; then
-    echo "ERROR: This system is not x86_64. Exiting." >&2
+ARCH=$(arch)
+
+# Must be run on 64-bit Intel or ARM
+if [[ "${ARCH}" != 'x86_64' ]] || [[ "${ARCH}" != 'aarch64' ]]; then
+    echo "ERROR: ${ARCH} arch is not x86_64 or aarch64. Exiting." >&2
     exit 1
+fi
+
+# Of course we can't use one word for arch; that would be madness
+# So let's define 'other arch'
+#
+# And of course grub uses $(arch) for intel but arm64 for arm so we
+# define a grub target as well.
+
+if [[ "${ARCH}" === 'x86_64' ]]; then
+  OARCH='amd64'
+  GTARGET='x86_64-efi' # the default, but explicit is always best
+elif [[ "${ARCH}" != 'aarch64' ]]; then
+  OARCH='arm64'
+  GTARGET='arm64-efi'
+else
+  echo "ERROR: Unknown arch so we cannot define other arch" >&2
+  exit 1
 fi
 
 # This nested echo is a hack
@@ -119,8 +138,8 @@ cd /mnt/gentoo
 
 # This should be better, but we're still in the hacking phase
 # TODO: Validate the stage3 tarball
-baseURL='http://distfiles.gentoo.org/releases/amd64/autobuilds'
-latestURL="${baseURL}/latest-stage3-amd64-openrc.txt"
+baseURL="http://distfiles.gentoo.org/releases/${OARCH}/autobuilds"
+latestURL="${baseURL}/latest-stage3-${OARCH}-openrc.txt"
 latest_stage3=$(curl -s ${latestURL} | grep -B 1 'BEGIN PGP SIGNATURE' | head -n 1 | cut -d ' ' -f 1)
 if [[ -z "${latest_stage3}" ]]; then
     echo "ERROR: Unable to find the latest stage3 tarball." >&2
@@ -148,6 +167,7 @@ mount --rbind /sys /mnt/gentoo/sys
 mount --make-rslave /mnt/gentoo/sys
 mount --rbind /dev /mnt/gentoo/dev
 mount --make-rslave /mnt/gentoo/dev
+
 
 # chroot all the things!
 # TODO:
@@ -178,7 +198,7 @@ echo 'GRUB_PLATFORMS="efi-64"' >> /etc/portage/make.conf
 emerge app-admin/sysklogd sys-process/cronie sys-fs/e2fsprogs sys-fs/dosfstools net-misc/dhcpcd sys-boot/grub:2
 rc-update add sysklogd default
 rc-update add cronie default
-grub-install --target=x86_64-efi --efi-directory=/boot
+grub-install --target=${GTARGET} --efi-directory=/boot
 grub-mkconfig -o /boot/grub/grub.cfg
 EOF
 
