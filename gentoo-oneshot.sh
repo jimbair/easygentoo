@@ -216,8 +216,12 @@ grub-install --target=${GTARGET} --efi-directory=/boot
 grub-mkconfig -o /boot/grub/grub.cfg
 EOF
 
+debug
+
 # Clean up and run away
 cd
 umount -l /mnt/gentoo/dev{/shm,/pts,}
 umount -R /mnt/gentoo
-reboot
+
+# Only reboot if not in debug mode
+[[ -z "$1" ]] && reboot
