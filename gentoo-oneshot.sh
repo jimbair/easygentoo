@@ -203,7 +203,6 @@ debug
 
 # The rest
 cat << EOF | chroot /mnt/gentoo
-echo -e "${ROOTPW}\n${ROOTPW}" | passwd root
 echo "${DISK}2   /boot        vfat    noauto,noatime       0 2" > /etc/fstab
 echo "${DISK}3   none         swap    sw                   0 0" >> /etc/fstab
 echo "${DISK}4   /            ext4    noatime              0 1" >> /etc/fstab
