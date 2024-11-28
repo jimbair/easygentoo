@@ -189,6 +189,19 @@ mount --make-rslave /mnt/gentoo/dev
 # Diddle make.conf a bit
 # Find way to abort if any chroot'd command fails
 # Handle config unmasking magically
+
+# Testing making this dynamic per command for error handling
+ric() {
+    cat << EOF | chroot /mnt/gentoo
+    $@
+    EOF
+}
+
+ric "echo -e ${ROOTPW}\n${ROOTPW} | passwd root"
+
+debug
+
+# The rest
 cat << EOF | chroot /mnt/gentoo
 echo -e "${ROOTPW}\n${ROOTPW}" | passwd root
 echo "${DISK}2   /boot        vfat    noauto,noatime       0 2" > /etc/fstab
