@@ -15,8 +15,9 @@ ROOTPW='ChangeMe123'
 
 # Debug is helpful when stuff breaks
 # Pass any single argument for debug mode
+DEBUG="$1"
 debug() {
-  [[ -n "$1" ]] && "read -p "DEBUG: Press enter to continue."
+  [[ -n "${DEBUG}" ]] && read -p "DEBUG: Press enter to continue."
 }
 
 # Find our disk
@@ -52,9 +53,11 @@ fi
 ARCH=$(arch)
 
 # Must be run on 64-bit Intel or ARM
-if [[ "${ARCH}" != 'x86_64' ]] || [[ "${ARCH}" != 'aarch64' ]]; then
+if [[ "${ARCH}" != 'x86_64' ]]; then
+  if [[ "${ARCH}" != 'aarch64' ]]; then
     echo "ERROR: ${ARCH} arch is not x86_64 or aarch64. Exiting." >&2
     exit 1
+  fi
 fi
 
 # Of course we can't use one word for arch; that would be madness
@@ -63,10 +66,10 @@ fi
 # And of course grub uses $(arch) for intel but arm64 for arm so we
 # define a grub target as well.
 
-if [[ "${ARCH}" === 'x86_64' ]]; then
+if [[ "${ARCH}" == 'x86_64' ]]; then
   OARCH='amd64'
   GTARGET='x86_64-efi' # the default, but explicit is always best
-elif [[ "${ARCH}" != 'aarch64' ]]; then
+elif [[ "${ARCH}" == 'aarch64' ]]; then
   OARCH='arm64'
   GTARGET='arm64-efi'
 else
@@ -136,6 +139,7 @@ if [[ $? -ne 0 ]]; then
     exit 1
 fi
 
+echo "INFO: Partitions created."
 debug
 
 # Format the things
@@ -145,6 +149,7 @@ mkswap ${DISK}3
 swapon ${DISK}3 # needed?
 mkfs.ext4 ${DISK}4
 
+echo "INFO: Filesystems created."
 debug
 
 # Mount the goods and fetch the gentooz
@@ -175,6 +180,9 @@ fi
 
 rm -f stage3-*.tar.xz
 
+echo "INFO: stage3 deployed"
+debug
+
 # Prep the chroot
 cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
 mount --types proc /proc /mnt/gentoo/proc
@@ -182,6 +190,9 @@ mount --rbind /sys /mnt/gentoo/sys
 mount --make-rslave /mnt/gentoo/sys
 mount --rbind /dev /mnt/gentoo/dev
 mount --make-rslave /mnt/gentoo/dev
+
+echo "INFO: chroot prepped"
+debug
 
 # chroot all the things!
 # TODO:
@@ -193,12 +204,13 @@ mount --make-rslave /mnt/gentoo/dev
 # Testing making this dynamic per command for error handling
 ric() {
     cat << EOF | chroot /mnt/gentoo
-    $@
-    EOF
+$@
+EOF
 }
 
 ric "echo -e ${ROOTPW}\n${ROOTPW} | passwd root"
 
+echo "DEBUG: Test ric() call ran"
 debug
 
 # The rest
