@@ -211,7 +211,11 @@ EOF
 
 # Let's see what breaks
 # IDEA: maybe echo command into file and cat file?
+
+# Wrap in quotes due to the pipe; though it seems broken anyway
 ric "echo -e ${ROOTPW}\n${ROOTPW} | passwd root"
+
+# Wrap in quotes to preserve spacing in fstab
 ric "echo ${DISK}2   /boot        vfat    noauto,noatime       0 2 > /etc/fstab"
 ric "echo ${DISK}3   none         swap    sw                   0 0 >> /etc/fstab"
 ric "echo ${DISK}4   /            ext4    noatime              0 1 >> /etc/fstab"
