@@ -206,18 +206,19 @@ ric() {
     cat << EOF | chroot /mnt/gentoo
 $@
 EOF
+    debug
 }
 
+# Let's see what breaks
+# IDEA: maybe echo command into file and cat file?
 ric "echo -e ${ROOTPW}\n${ROOTPW} | passwd root"
-
-echo "DEBUG: Test ric() call ran"
-debug
+ric "echo ${DISK}2   /boot        vfat    noauto,noatime       0 2 > /etc/fstab"
+ric "echo ${DISK}3   none         swap    sw                   0 0 >> /etc/fstab"
+ric "echo ${DISK}4   /            ext4    noatime              0 1 >> /etc/fstab"
 
 # The rest
+# The lack of a persistently mounted /boot might be a problem
 cat << EOF | chroot /mnt/gentoo
-echo "${DISK}2   /boot        vfat    noauto,noatime       0 2" > /etc/fstab
-echo "${DISK}3   none         swap    sw                   0 0" >> /etc/fstab
-echo "${DISK}4   /            ext4    noatime              0 1" >> /etc/fstab
 mount /boot
 emerge-webrsync
 emerge --update --deep --newuse @world
